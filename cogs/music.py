@@ -211,13 +211,14 @@ class Music(commands.Cog):
 
 	def play_next(self, ctx):
 		global q
+		global track
 		if not q:
+			track = None
 			asyncio.run_coroutine_threadsafe(
 				ctx.send(f"Finished playing queue."), self.bot.loop
 				or asyncio.get_event_loop()
 			).result()
 			return
-		global track
 		track = q.pop(0)
 		if not ctx.voice_client.is_playing():
 			player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(track.source, **ffmpeg_options), volume=1.0)
