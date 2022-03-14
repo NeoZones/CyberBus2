@@ -1,0 +1,13 @@
+pip
+requests
+pycord/.
+pycord/.[voice]
+asyncio
+youtube-dl
+youtube-search
+pynacl
+aiodns
+brotlipy
+cchardet
+orjson
+python-dotenv

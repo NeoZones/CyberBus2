@@ -1,0 +1,5 @@
+.env
+.cache/*
+sounds/originals/*
+sounds/normalized/*
+cogs/__pycache__/*
