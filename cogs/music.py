@@ -223,7 +223,7 @@ class Music(commands.Cog):
 			player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(track.source, **ffmpeg_options), volume=1.0)
 			ctx.voice_client.play(player, after=lambda e: self.play_next(ctx))
 	
-	def check_for_numbers(ctx):
+	def check_for_numbers(self, ctx):
 		"""anti numbers action"""
 		NUMBERS = 187024083471302656
 		RICKY = 949503750651936828
