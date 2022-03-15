@@ -39,8 +39,8 @@ Some utility scripts are provided to interface with the Discord REST API. These 
 
 For use with the music cog, a `sounds/` directory is provided.
 - Sound files may be placed in the `sounds/originals` subdirectory, and additional subdirectories are supported.
-- The `normalize` Bash script should be used to normalize all audio within the `originals` subdirectory.
-- The bot will check for sound files within the `sounds/normalized` subdirectory, which is where the `normalize` script will output all of its files.
+- The `normalize` Bash script should be used to normalize all audio within the `originals` subdirectory. This requires [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize).
+- The bot will currently check for sound files within the `sounds/normalized` subdirectory, which is where the `normalize` script will output all of its files.
 
 ## Getting started
 
@@ -48,6 +48,7 @@ For use with the music cog, a `sounds/` directory is provided.
 - Python 3.10+
 - ffmpeg
 - youtube-dl
+- [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize)
 
 ### Instructions
 
