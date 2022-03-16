@@ -221,7 +221,7 @@ class Music(Cog):
 			return
 		current_track = q.pop(0)
 		if not ctx.voice_client.is_playing():
-			player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(track.source, **ffmpeg_options), volume=1.0)
+			player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(current_track.source, **ffmpeg_options), volume=1.0)
 			ctx.voice_client.play(player, after=lambda e: self.play_next(ctx))
 	
 	def check_for_numbers(self, ctx):
