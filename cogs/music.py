@@ -230,11 +230,8 @@ class Music(Cog):
 		RICKY = 949503750651936828
 		members = ctx.author.voice.channel.members
 		if ctx.author.id == NUMBERS:
-			current_vc_members = [
-				member.id
-				for member in members
-			]
-			other_members = current_vc_members.remove(NUMBERS).remove(RICKY)
+			current_vc_members = {member.id for member in members}
+			other_members = current_vc_members - {NUMBERS} - {RICKY}
 			return (NUMBERS in current_vc_members) and not other_members
 		return True
 
