@@ -1,13 +1,13 @@
 import discord
-from discord.ext import commands
+from discord.ext.commands import Bot, when_mentioned_or
 """ Declare intents that the bot will use """
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.reactions = True
 """ Initialize the bot """
-bot = commands.Bot(
-	command_prefix=commands.when_mentioned_or('..', '>', '.'),
+bot = Bot(
+	command_prefix=when_mentioned_or('..', '>', '.'),
 	description="A list of commands available",
 	intents=intents
 )
@@ -20,10 +20,11 @@ async def on_ready():
 """ Load the bot token """
 from dotenv import load_dotenv
 load_dotenv()
-import os
-TOKEN = os.getenv("BOT_TOKEN")
+from os import getenv
+TOKEN = getenv("BOT_TOKEN")
 """ Load cogs """
-for file in os.listdir("cogs"):
+from os import listdir
+for file in listdir("cogs"):
 	if not file.endswith(".py"):
 		continue
 	name = file[:-3]

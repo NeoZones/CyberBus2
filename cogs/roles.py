@@ -1,13 +1,14 @@
 import discord
-from discord.ext import commands
-from discord.commands import Option, slash_command
-import inspect
+from discord.ext.commands import Cog
+from discord.commands import slash_command, Option
+from os import getenv
 
 def setup(bot):
 	bot.add_cog(Roles(bot))
 
-class Roles(commands.Cog):
+class Roles(Cog):
 	"""Let users choose their roles"""
+
 	def __init__(self, bot):
 		self.bot = bot
 		print("Initialized Roles cog")
@@ -60,7 +61,7 @@ class Roles(commands.Cog):
 		'PRONOUN_THEY': 692142321072078918,
 	}
 
-	@commands.Cog.listener()
+	@Cog.listener()
 	async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
 		guild = self.bot.get_guild(payload.guild_id)
 		member = guild.get_member(payload.user_id)
@@ -93,7 +94,7 @@ class Roles(commands.Cog):
 		if role:
 			await member.add_roles(role)
 
-	@commands.Cog.listener()
+	@Cog.listener()
 	async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
 		guild = self.bot.get_guild(payload.guild_id)
 		member = guild.get_member(payload.user_id)
@@ -175,7 +176,7 @@ class Roles(commands.Cog):
 
 	@slash_command(
 		description="Choose the color of your display name",
-		guild_ids=[518624497780391948]
+		guild_ids=[getenv("GUILD_ID")]
 	)
 	async def color(
 		self,
@@ -184,6 +185,10 @@ class Roles(commands.Cog):
 	):
 		"""Choose the color of your display name"""
 		color = "COLOR_" + name.replace(" ", "_").upper()
+		if self.roles[color] == 726069856528498738:
+			new_color_role = ctx.guild.get_role(self.roles[color])
+			await ctx.interaction.user.add_roles(new_color_role)
+			return await ctx.respond(f"You should now have the {name} role.", ephemeral=True)
 		try:
 			new_color_role = ctx.guild.get_role(self.roles[color])
 			all_current_roles = ctx.interaction.user.roles

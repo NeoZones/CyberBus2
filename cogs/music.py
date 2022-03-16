@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, pages
+from discord.ext.commands import Cog, command
 import asyncio
 import subprocess
 from datetime import timedelta
@@ -10,7 +10,7 @@ def setup(bot):
 MAX_RESULTS = 5
 results = None
 q = []
-track = None
+current_track = None
 
 class Track:
 	
@@ -62,14 +62,14 @@ class Track:
 	def length(self) -> str:
 		return str(timedelta(seconds=int(self.duration)))
 
-class Music(commands.Cog):
+class Music(Cog):
 	"""Play audio within a voice channel."""
 	
 	def __init__(self, bot):
 		self.bot = bot
 		print("Initialized Music cog")
 	
-	@commands.command(aliases=['start', 'summon', 'connect'])
+	@command(aliases=['start', 'summon', 'connect'])
 	async def join(self, ctx, *, channel: discord.VoiceChannel = None):
 		"""Joins a voice channel"""
 		if not channel: # Upon a raw "join" command without a channel specified,
@@ -78,7 +78,7 @@ class Music(commands.Cog):
 			return await ctx.voice_client.move_to(channel) # move to your channel.
 		await channel.connect() # Finally, join the chosen channel.
 	
-	@commands.command(aliases=['quit', 'dismiss', 'disconnect'])
+	@command(aliases=['quit', 'dismiss', 'disconnect'])
 	async def leave(self, ctx):
 		"""Stop+disconnect from voice"""
 		await ctx.voice_client.disconnect()
@@ -194,7 +194,7 @@ class Music(commands.Cog):
 		results = YoutubeSearch(query, max_results=MAX_RESULTS).to_dict()
 		await self.results(ctx, results)
 	
-	@commands.command()
+	@command()
 	async def results(self, ctx, results):
 		"""Show results of a prior search"""
 		formatted_results = (
@@ -211,15 +211,15 @@ class Music(commands.Cog):
 
 	def play_next(self, ctx):
 		global q
-		global track
+		global current_track
 		if not q:
-			track = None
+			current_track = None
 			asyncio.run_coroutine_threadsafe(
 				ctx.send(f"Finished playing queue."), self.bot.loop
 				or asyncio.get_event_loop()
 			).result()
 			return
-		track = q.pop(0)
+		current_track = q.pop(0)
 		if not ctx.voice_client.is_playing():
 			player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(track.source, **ffmpeg_options), volume=1.0)
 			ctx.voice_client.play(player, after=lambda e: self.play_next(ctx))
@@ -238,7 +238,7 @@ class Music(commands.Cog):
 			return (NUMBERS in current_vc_members) and not other_members
 		return True
 
-	@commands.command(aliases=['p', 'listen'])
+	@command(aliases=['p', 'listen'])
 	async def play(self, ctx, *, query):
 		"""Add track(s) to queue"""
 		allowed = self.check_for_numbers(ctx)
@@ -263,7 +263,7 @@ class Music(commands.Cog):
 				await ctx.send(f"Playing {len(tracks)} tracks.")
 			self.play_next(ctx)
 	
-	@commands.command(aliases=['ptop', 'top'])
+	@command(aliases=['ptop', 'top'])
 	async def playtop(self, ctx, *, query):
 		"""Add tracks to top of queue"""
 		allowed = self.check_for_numbers(ctx)
@@ -300,7 +300,7 @@ class Music(commands.Cog):
 	# TODO: autoplay???? [???????????]
 	# TODO: filters? bass boost? nightcore? speed? [probs not]
 	
-	@commands.command(aliases=['q'])
+	@command(aliases=['q'])
 	async def queue(self, ctx):
 		"""Show tracks up next"""
 		# TODO: paginate this
@@ -317,48 +317,48 @@ class Music(commands.Cog):
 				)
 		await ctx.send(formatted_results)
 	
-	@commands.command(aliases=['np'])
+	@command(aliases=['np'])
 	async def nowplaying(self, ctx):
 		"""Show currently playing track"""
-		global track
-		await ctx.send(f"Now playing:\n{track}")
+		global current_track
+		await ctx.send(f"Now playing:\n{current_track}")
 	
-	@commands.command()
+	@command()
 	async def skip(self, ctx):
-		global track
+		global current_track
 		if ctx.voice_client.is_playing():
-			await ctx.send(f"Skipping: {track.title}")
+			await ctx.send(f"Skipping: {current_track.title}")
 			return await ctx.voice_client.stop()
 	
-	@commands.command()
+	@command()
 	async def remove(self, ctx, i):
 		global q
 		i = int(i) - 1
 		track = q.pop(i)
 		await ctx.send(f"Removing: {track.title}")
 	
-	@commands.command()
+	@command()
 	async def pause(self, ctx):
 		"""Pause the currently playing track"""
 		if ctx.voice_client.is_playing():
 			ctx.voice_client.pause()
 			return await ctx.send(f"Playback is paused.")
 	
-	@commands.command()
+	@command()
 	async def resume(self, ctx):
 		"""Resume playback of a paused track"""
 		if ctx.voice_client.is_paused():
 			ctx.voice_client.resume()
 			return await ctx.send(f"Playback is resuming.")
 	
-	@commands.command()
+	@command()
 	async def stop(self, ctx):
 		"""Clear queue and stop playing"""
 		await self.clear(ctx)
 		ctx.voice_client.stop()
 		return await ctx.send(f"Stopped playing tracks and cleared queue.")
 	
-	@commands.command()
+	@command()
 	async def clear(self, ctx):
 		"""Clear queue, but keep playing current track"""
 		if ctx.voice_client.is_connected():
@@ -366,7 +366,7 @@ class Music(commands.Cog):
 			q = []
 			return await ctx.send(f"Queue has been cleared.")
 	
-	@commands.command(aliases=['v', 'vol'])
+	@command(aliases=['v', 'vol'])
 	async def volume(self, ctx, volume: int):
 		"""Changes the player's volume"""
 		if ctx.voice_client is None:
@@ -376,7 +376,7 @@ class Music(commands.Cog):
 		ctx.voice_client.source.volume = volume / 100
 		await ctx.send(f"Changed volume to {volume}%")
 	
-	@commands.command(aliases=['list'])
+	@command(aliases=['list'])
 	async def catalogue(self, ctx, subdirectory=""):
 		"""Shows the available local files"""
 		if ".." in subdirectory:

@@ -1,16 +1,16 @@
 import discord
-from discord.ext import commands
+from discord.ext.commands import Cog
 
 def setup(bot):
 	bot.add_cog(Piss(bot))
 
-class Piss(commands.Cog):
+class Piss(Cog):
 	"""Provide too much information when a certain substance is mentioned"""
 	def __init__(self, bot):
 		self.bot = bot
 		print("Initialized Piss cog")
 
-	@commands.Cog.listener()
+	@Cog.listener()
 	async def on_message(self, message):
 		if message.author.id == self.bot.user.id:
 			return

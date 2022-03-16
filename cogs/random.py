@@ -1,35 +1,83 @@
 import discord
-from discord.ext import commands
+from discord.ext.commands import Cog, command
+from discord.commands import slash_command, Option
+import requests
+from os import getenv
+from collections import Counter
+import re
 
 def setup(bot):
 	bot.add_cog(Random(bot))
 
-import requests
-class Random(commands.Cog):
+class Random(Cog):
 	"""Use random.org to provide a truly random result"""
 	def __init__(self, bot):
 		self.bot = bot
 		print("Initialized Random cog")
 	
-	@commands.command(aliases=['dice'])
-	async def roll(self, ctx, query: str = None):
-		"""Roll some dice. Defaults to 1d6."""
-		if not query:
-			query = 'd6'
-		number, faces = query.split('d')
-		if not number:
-			number = '1'
-		number = int(number)
-		faces = int(faces)
-		result = requests.get(f'https://www.random.org/integers/?num={number}&min=1&max={faces}&col=1&base=10&format=plain&rnd=new').text
-		await ctx.send(result)
+	def roll(self, *, faces: int = 6, number: int = 1):
+		columns = number if number < 11 else 10
+		return requests.get(f'https://www.random.org/integers/?num={number}&min=1&max={faces}&col={columns}&base=10&format=plain&rnd=new').text
 
-	@commands.command(aliases=['coin'])
-	async def flip(self, ctx, number: int = None):
-		"""Flip a coin. Defaults to 1 flip."""
-		if not number:
+	def roll_results(self, *, faces: int = 6, number: int = 1):
+		"""Returns a formatted string to output"""
+		result = self.roll(faces=int(faces), number=int(number))
+		if faces == 100: # 00 - 99
+			result = re.sub('100', '00', result)
+			result = re.sub(r'\b(\d){1}\b', r'0\1', result) # zero pad single digit
+		return f"*You rolled {number}d{faces} and got:*\n**{result}**"
+
+	@command(
+		name='roll',
+		aliases=['dice']
+	)
+	async def roll_prefix(self, ctx, query: str = '1d6'):
+		number, faces = query.split('d')
+		if not number: # handle raw dN rolls, e.g. 'd6' or 'd20'
 			number = 1
+		await ctx.send(self.roll_results(faces=int(faces), number=int(number)))
+	
+	@slash_command(
+		name='roll',
+		guild_ids=[getenv("GUILD_ID")]
+	)
+	async def roll_slash(self,
+		ctx: discord.ApplicationContext,
+		faces: Option(int, "How many faces are on each die?", min_value=1, max_value=1_000_000_000, default=6),
+		number: Option(int, "How many dies should be rolled?", min_value=1, max_value=10_000, default=1)
+	):
+		await ctx.respond(self.roll_results(faces=faces, number=number))
+
+	def flip(self, number: int = 1):
+		"""Flip a coin. Defaults to 1 flip."""
 		result = requests.get(f'https://www.random.org/integers/?num={number}&min=1&max=2&col=1&base=10&format=plain&rnd=new').text
 		result = result.replace('1', 'Heads')
 		result = result.replace('2', 'Tails')
-		await ctx.send(result)
+		return result
+	
+	def flip_results(self, number: int = 1):
+		"""Returns a formatted string to output"""
+		result = self.flip(number)
+		c = Counter(result.split('\n'))
+		return (
+			f"*You flipped {number} coins and got:*\n"
+			f"**{c['Heads']}** Heads\n"
+			f"**{c['Tails']}** Tails"
+		)
+
+	@command(
+		name='flip',
+		aliases=['coin']
+	)
+	async def flip_prefix(self, ctx, number: str = 1):
+		await ctx.send(self.flip_results(number))
+
+	@slash_command(
+		name='flip',
+		guild_ids=[getenv("GUILD_ID")]
+		)
+	async def flip_slash(self,
+		ctx: discord.ApplicationContext,
+		number: Option(int, "How many coins should be flipped?", min_value=1, max_value=10_000, default=1)
+	):
+		await ctx.respond(self.flip_results(number))

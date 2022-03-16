@@ -1,16 +1,17 @@
 import discord
-from discord.ext import commands
+from discord.ext.commands import Cog, command
+import re, random
 
 def setup(bot):
 	bot.add_cog(Uwu(bot))
 
-class Uwu(commands.Cog):
+class Uwu(Cog):
 	"""uwu-ify some text"""
 	def __init__(self, bot):
 		self.bot = bot
 		print("Initialized Uwu cog")
 
-	@commands.command()
+	@command()
 	async def uwu(self, ctx, *, text: str = None):
 		"""uwu-ify some text
 
@@ -22,7 +23,7 @@ class Uwu(commands.Cog):
 		if not text:
 			history = await ctx.channel.history(limit=2).flatten()
 			text = history[1].content
-		import re, random
+		
 		suffixes = [
 			" XDDD",
 			" UwU",
