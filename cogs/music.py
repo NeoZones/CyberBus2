@@ -112,20 +112,22 @@ class Music(Cog):
 		"""Handle local playback"""
 		if tracks := await self.get_tracks_from_path(ctx, query):
 			return tracks
-		"""Handle prior search"""
+		"""Do a youtube search if not found and no prior search"""
 		global results
 		global MAX_RESULTS
-		if results:
-			try:
-				i = int(query) - 1
-			except ValueError:
-				return ctx.send(f"Please provide an integer between 1 and {MAX_RESULTS}")
-			if i not in range(MAX_RESULTS + 1):
-				return ctx.send(f"Please provide an integer between 1 and {MAX_RESULTS}")
-			url = f"https://youtube.com{results[i]['url_suffix']}"
-			results = []
-			return await self.get_tracks_from_url(ctx, url)
-		"""Do a youtube search if none found"""
+		if not results:
+			return await self.search_youtube(ctx, query)
+		"""Handle prior search"""
+		try:
+			i = int(query) - 1
+		except ValueError:
+			return ctx.send(f"Please provide an integer between 1 and {MAX_RESULTS}")
+		if i not in range(MAX_RESULTS + 1):
+			return ctx.send(f"Please provide an integer between 1 and {MAX_RESULTS}")
+		url = f"https://youtube.com{results[i]['url_suffix']}"
+		results = []
+		return await self.get_tracks_from_url(ctx, url)
+		
 		await self.search_youtube(ctx, query)
 	
 	async def get_tracks_from_url(self, ctx, url, download=False):
@@ -228,8 +230,10 @@ class Music(Cog):
 		"""anti numbers action"""
 		NUMBERS = 187024083471302656
 		RICKY = 949503750651936828
-		members = ctx.author.voice.channel.members
-		if ctx.author.id == NUMBERS:
+		if ctx.author.id != NUMBERS:
+			return True
+		if ctx.author.voice:
+			members = ctx.author.voice.channel.members
 			current_vc_members = {member.id for member in members}
 			other_members = current_vc_members - {NUMBERS} - {RICKY}
 			return (NUMBERS in current_vc_members) and not other_members
@@ -253,12 +257,11 @@ class Music(Cog):
 		q += tracks
 		if ctx.voice_client.is_playing():
 			return await ctx.send(f"Added **{len(tracks)}** track(s) to queue.")
+		if len(q) == 1:
+			await ctx.send(f"Playing **{q[0].title}**")
 		else:
-			if len(q) == 1:
-				await ctx.send(f"Playing **{q[0].title}**")
-			else:
-				await ctx.send(f"Playing {len(tracks)} tracks.")
-			self.play_next(ctx)
+			await ctx.send(f"Playing {len(tracks)} tracks.")
+		self.play_next(ctx)
 	
 	@command(aliases=['ptop', 'top'])
 	async def playtop(self, ctx, *, query):
@@ -278,12 +281,11 @@ class Music(Cog):
 		q = tracks + q
 		if ctx.voice_client.is_playing():
 			return await ctx.send(f"Added **{len(tracks)}** track(s) to top of queue.")
+		if len(q) == 1:
+			await ctx.send(f"Playing **{q[0].title}**")
 		else:
-			if len(q) == 1:
-				await ctx.send(f"Playing **{q[0].title}**")
-			else:
-				await ctx.send(f"Playing {len(tracks)} tracks.")
-			self.play_next(ctx)
+			await ctx.send(f"Playing {len(tracks)} tracks.")
+		self.play_next(ctx)
 	
 	# TODO: repeat once, repeat all, repeat none (repeat/loop command)
 	# TODO: move positions of songs?
@@ -304,14 +306,13 @@ class Music(Cog):
 		formatted_results = ""
 		global q
 		if not q:
-			formatted_results += "The queue is currently empty."
-		else:
-			formatted_results += "Up next:\n"
-			for i, track in enumerate(q):
-				formatted_results += (
-					f"{i+1}: **{track.title}** ({track.length})"
-					f" - requested by {track.requester}\n"
-				)
+			return await ctx.send("The queue is currently empty.")
+		formatted_results += "Up next:\n"
+		for i, track in enumerate(q):
+			formatted_results += (
+				f"{i+1}: **{track.title}** ({track.length})"
+				f" - requested by {track.requester}\n"
+			)
 		await ctx.send(formatted_results)
 	
 	@command(aliases=['np'])
@@ -325,7 +326,7 @@ class Music(Cog):
 		global current_track
 		if ctx.voice_client.is_playing():
 			await ctx.send(f"Skipping: {current_track.title}")
-			return await ctx.voice_client.stop()
+			await ctx.voice_client.stop()
 	
 	@command()
 	async def remove(self, ctx, i):
@@ -339,21 +340,21 @@ class Music(Cog):
 		"""Pause the currently playing track"""
 		if ctx.voice_client.is_playing():
 			ctx.voice_client.pause()
-			return await ctx.send(f"Playback is paused.")
+			await ctx.send(f"Playback is paused.")
 	
 	@command()
 	async def resume(self, ctx):
 		"""Resume playback of a paused track"""
 		if ctx.voice_client.is_paused():
 			ctx.voice_client.resume()
-			return await ctx.send(f"Playback is resuming.")
+			await ctx.send(f"Playback is resuming.")
 	
 	@command()
 	async def stop(self, ctx):
 		"""Clear queue and stop playing"""
 		await self.clear(ctx)
 		ctx.voice_client.stop()
-		return await ctx.send(f"Stopped playing tracks and cleared queue.")
+		await ctx.send(f"Stopped playing tracks and cleared queue.")
 	
 	@command()
 	async def clear(self, ctx):
@@ -361,7 +362,7 @@ class Music(Cog):
 		if ctx.voice_client.is_connected():
 			global q
 			q = []
-			return await ctx.send(f"Queue has been cleared.")
+			await ctx.send(f"Queue has been cleared.")
 	
 	@command(aliases=['v', 'vol'])
 	async def volume(self, ctx, volume: int):
@@ -377,7 +378,7 @@ class Music(Cog):
 	async def catalogue(self, ctx, subdirectory=""):
 		"""Shows the available local files"""
 		if ".." in subdirectory:
-			return
+			return await ctx.send(f"Nice try, but that won't work.")
 		path = "."
 		if subdirectory:
 			path += f"/{subdirectory}"
@@ -398,11 +399,12 @@ class Music(Cog):
 	@play.before_invoke
 	@playtop.before_invoke
 	async def ensure_voice(self, ctx):
-		if ctx.voice_client is None:
-			if ctx.author.voice:
-				await ctx.author.voice.channel.connect()
-			else:
-				await ctx.send("You are not connected to a voice channel.")
+		if ctx.voice_client is not None:
+			return
+		if ctx.author.voice:
+			await ctx.author.voice.channel.connect()
+		else:
+			await ctx.send("You are not connected to a voice channel.")
 
 """
 Initialize youtube-dl service.
