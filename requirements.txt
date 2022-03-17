@@ -2,6 +2,7 @@ pip
 requests
 pycord/.
 pycord/.[voice]
+pycord/.[speed]
 asyncio
 youtube-dl
 youtube-search
