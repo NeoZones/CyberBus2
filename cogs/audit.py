@@ -133,7 +133,7 @@ class Audit(Cog):
 			)
 			return await self.channel.send(embed=embed)
 
-		if before.embeds != after.embeds and before.embeds: # embeds removed
+		if before.embeds != after.embeds and before.embeds and not after.embeds: # embeds removed
 			embed.description = "Embed was removed"
 			embed = embed.add_field(
 				name = "Content",

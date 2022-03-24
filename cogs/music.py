@@ -7,6 +7,7 @@ from os import getenv # unused - can fetch user/pass for age-restricted videos
 from time import time # performance tracking
 import random # for shuffling the queue
 import math # for ceiling function in queue pages
+from functools import partial
 
 def setup(bot):
 	bot.add_cog(Music(bot))
@@ -28,17 +29,27 @@ class Player(discord.PCMVolumeTransformer):
 		source,
 		duration,
 		*,
-		data = None
+		data = None,
 	):
-		if source.startswith('http'):
-			data = ytdl.extract_info(source, download=False)
-			source = data["url"]
 		super().__init__(discord.FFmpegPCMAudio(source, **ffmpeg_options))
 		self.packets_read = 0
 		self.source = source
 		self.duration = duration
 		self.data = data
 	
+	@classmethod
+	async def prepare_file(cls, track, *, loop):
+		loop = loop or asyncio.get_event_loop()
+		return cls(track.source, track.duration, data = data)
+
+	@classmethod
+	async def prepare_stream(cls, track, *, loop):
+		loop = loop or asyncio.get_event_loop()
+		to_run = partial(ytdl.extract_info, url = track.source, download = False)
+		data = await loop.run_in_executor(None, to_run)
+		return cls(data['url'], track.duration, data = data)
+
+
 	def __repr__(self):
 		return ''.join([f"{key=}\n" for key in self.__dict__])
 
@@ -112,6 +123,7 @@ class Music(Cog):
 		self.track = None
 		self.repeat_mode = Music.REPEAT_NONE
 		self.search_results = None
+		self.i = -1
 		print("Initialized Music cog")
 	
 	@command(aliases=['start', 'summon', 'connect'])
@@ -180,10 +192,8 @@ class Music(Cog):
 	async def get_tracks_from_url(self, ctx, url, download=False):
 		try:
 			data = ytdl.extract_info(url, download=download)
-			print(data)
 			# Detect tabs
-			if data['extractor'] == 'youtube:tab':
-				print(data['url'])
+			if data['extractor'] == 'youtube:tab' and not "entries" in data:
 				data = ytdl.extract_info(data['url'], download=download) # process the playlist url
 		except Exception as e:
 			return e
@@ -276,7 +286,7 @@ class Music(Cog):
 		if not self.search_results:
 			return await ctx.send("There are no stored search results right now.")
 
-		pages = []
+		embeds = []
 
 		formatted_results = (
 		f"Performed a search for `{self.search_results['id']}`.\n"
@@ -303,11 +313,11 @@ class Music(Cog):
 			f"{uploader} - {views} views\n"
 			)
 
-			pages.append(
+			embeds.append(
 				discord.Embed(
 					title = title,
 					url = url,
-					type = 'video',
+					type = 'image',
 					colour = 0xff0000,
 				).add_field(
 					name = "Duration",
@@ -323,23 +333,38 @@ class Music(Cog):
 				)
 			)
 
-		return await ctx.send(formatted_results)
+		return await ctx.send(formatted_results, embeds = embeds)
 
-	def play_next(self, ctx):
-		if not self.q:
-			self.track = None
-			asyncio.run_coroutine_threadsafe(
-				ctx.send(f"Finished playing queue."),
-				self.bot.loop or asyncio.get_event_loop()
-			).result()
-			return
+	async def play_next(self, ctx):
 		if not ctx.voice_client:
 			return
-		if not ctx.voice_client.is_playing():
+
+		if self.repeat_mode == Music.REPEAT_NONE:
 			self.track = self.q.pop(0)
-			player = Player(self.track.source, self.track.duration)
-			ctx.voice_client.play(player,after=lambda e: self.play_next(ctx))
+		elif self.repeat_mode == Music.REPEAT_ONE:
+			self.track = self.track
+		elif self.repeat_mode == Music.REPEAT_ALL:
+			self.i += 1
+			if self.i >= len(self.q):
+				self.i = 0
+			self.track = self.q[self.i]
+
+		if self.track.source.startswith('http'):
+			player = await Player.prepare_stream(self.track, loop = self.bot.loop)
+		else:
+			player = await Player.prepare_file(self.track, loop = self.bot.loop)
+		
+		ctx.voice_client.play(
+			player,
+			after=lambda e: self.bot.loop.call_soon_threadsafe(self.after(ctx))
+		)
 	
+	async def after(self, ctx):
+		if not self.q:
+			await ctx.send(f"Finished playing queue.")
+		if self.q and not ctx.voice_client.is_playing():
+			await self.play_next(ctx)
+
 	def check_for_numbers(self, ctx):
 		"""anti numbers action"""
 		NUMBERS = 187024083471302656
@@ -381,7 +406,7 @@ class Music(Cog):
 		if isinstance(tracks, Exception):
 			return await ctx.send(
 			f"An error occurred while trying to add `{query}` to the queue:\n"
-			f"```{tracks.exc_info[1]}```"
+			f"```{tracks}```"
 			)
 		if not tracks: # a search was performed instead
 			return
@@ -400,7 +425,7 @@ class Music(Cog):
 			await ctx.send(f"Playing **{self.q[0].title}**") 
 		else:
 			await ctx.send(f"Playing {len(tracks)} tracks.")
-		self.play_next(ctx)
+		await self.play_next(ctx)
 
 
 	@command(aliases=['p', 'listen'])
@@ -432,11 +457,15 @@ class Music(Cog):
 		full_q = [self.track] + self.q
 		page = full_q[self.PAGE_SIZE*(p-1):self.PAGE_SIZE*p]
 		formatted_results = ""
-		formatted_results += f"Up next (page {p} of {math.ceil(len(full_q) / self.PAGE_SIZE)}):\n"
+		formatted_results += f"Page {p} of {math.ceil(len(full_q) / self.PAGE_SIZE)}:\n"
 		for i, track in enumerate(page):
+			if i == 0:
+				formatted_results += "=== Currently playing ===\n"
 			formatted_results += (
 				f"{(p-1)*self.PAGE_SIZE+i+1}: {track}\n"
 			)
+			if i == 0:
+				formatted_results += "=== Up next ===\n"
 		await ctx.send(formatted_results)
 	
 	@command(aliases=['np'])
@@ -559,7 +588,7 @@ ytdl_format_options = {
 	"format": "bestaudio/best",
 	"outtmpl": ".cache/%(extractor)s-%(id)s-%(title)s.%(ext)s",
 	"restrictfilenames": True,
-	"noplaylist": False, # this was voted to be preferred behavior
+	"noplaylist": True,
 	"nocheckcertificate": True,
 	"ignoreerrors": False,
 	"logtostderr": False,
