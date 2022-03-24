@@ -10,9 +10,11 @@ def setup(bot):
 class Unpin(Cog):
 	"""Reply to unpinned messages in the channel they were posted"""
 
+	GUILD = int(getenv("GUILD_ID"))
+
 	def __init__(self, bot):
 		self.bot = bot
-		self.guild = self.bot.get_guild(int(getenv("GUILD_ID")))
+		self.guild = self.bot.get_guild(self.GUILD)
 		# load cache from pickle if it exists
 		filename = '.cache/messages/pins.pickle'
 		self.cache = set()
