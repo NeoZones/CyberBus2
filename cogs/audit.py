@@ -9,8 +9,8 @@ def setup(bot):
 class Audit(Cog):
 	"""Posts events from the audit log to a specified channel."""
 
-	CHANNEL = 519071523714367489
-	CHANNEL = 951378341162807387
+	CHANNEL = 519071523714367489 # server-log channel
+	#CHANNEL = 951378341162807387 # bot-test channel
 	GUILD = int(getenv("GUILD_ID"))
 
 	def __init__(self, bot):

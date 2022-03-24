@@ -356,14 +356,20 @@ class Music(Cog):
 		
 		ctx.voice_client.play(
 			player,
-			after=lambda e: self.bot.loop.call_soon_threadsafe(self.after(ctx))
+			after=lambda e: self.after(ctx)
 		)
 	
-	async def after(self, ctx):
+	def after(self, ctx):
 		if not self.q:
-			await ctx.send(f"Finished playing queue.")
+			asyncio.run_coroutine_threadsafe(
+				ctx.send(f"Finished playing queue."),
+				self.bot.loop
+			).result()
 		if self.q and not ctx.voice_client.is_playing():
-			await self.play_next(ctx)
+			asyncio.run_coroutine_threadsafe(
+				self.play_next(ctx),
+				self.bot.loop
+			).result()
 
 	def check_for_numbers(self, ctx):
 		"""anti numbers action"""
