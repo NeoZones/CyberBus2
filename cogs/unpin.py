@@ -10,11 +10,12 @@ def setup(bot):
 class Unpin(Cog):
 	"""Reply to unpinned messages in the channel they were posted"""
 
-	GUILD = int(getenv("GUILD_ID"))
-
 	def __init__(self, bot):
 		self.bot = bot
-		self.guild = self.bot.get_guild(self.GUILD)
+		self.guild = asyncio.run_coroutine_threadsafe(
+			self.bot.fetch_guild(int(getenv("GUILD_ID"))),
+			self.bot.loop or asyncio.get_event_loop()
+		).result()
 		# load cache from pickle if it exists
 		filename = '.cache/messages/pins.pickle'
 		self.cache = set()
@@ -47,7 +48,7 @@ class Unpin(Cog):
 	@Cog.listener()
 	async def on_ready(self):
 		await self.bot.wait_until_ready()
-		self.guild = self.bot.get_guild(int(getenv("GUILD_ID")))
+		self.guild = await self.bot.fetch_guild(int(getenv("GUILD_ID")))
 		# load cache from pickle if it exists
 		filename = '.cache/messages/pins.pickle'
 		self.cache = set()
