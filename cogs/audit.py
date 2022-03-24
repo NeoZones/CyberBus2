@@ -677,8 +677,8 @@ class Audit(Cog):
 
 		before_set = set(before)
 		after_set = set(after)
-		added = after - before
-		removed = before - after
+		added = after_set - before_set
+		removed = before_set - after_set
 
 		added_string = "Added:\n"
 		removed_string = "Removed:\n"
@@ -705,8 +705,8 @@ class Audit(Cog):
 
 		before_set = set(before)
 		after_set = set(after)
-		added = after - before
-		removed = before - after
+		added = after_set - before_set
+		removed = before_set - after_set
 
 		added_string = "Added:\n"
 		removed_string = "Removed:\n"
