@@ -281,7 +281,16 @@ class Audit(Cog):
 			embed.description += f"- {after.mention} changed category from {before.category} to {after.category}\n"
 		
 		if before.changed_roles != after.changed_roles:
-			embed.description += f"- {after.mention} changed roles from {before.changed_roles} to {after.changed_roles}\n"
+			roles_before = set(before.changed_roles)
+			roles_after = set(after.changed_roles)
+			roles_added = roles_after - roles_before
+			roles_removed = roles_before - roles_after
+			embed.description += f"- {after.mention} changed roles\n"
+
+			for role in roles_added:
+				embed.description += f"  + {role}\n"
+			for role in roles_removed:
+				embed.description += f"  - {role}\n"
 
 		if before.default_auto_archive_duration != after.default_auto_archive_duration:
 			embed.description += f"- {after.mention} changed auto-archive duration from {before.default_auto_archive_duration} minutes to {after.default_auto_archive_duration} minutes\n"
@@ -295,7 +304,41 @@ class Audit(Cog):
 			embed.description += f"- {after.mention} was unmarked as NSFW\n"
 
 		if before.overwrites != after.overwrites:
-			embed.description += f"- {after.mention} changed overwrites from {before.overwrites} to {after.overwrites}\n"
+			embed.description += f"- {after.mention} changed overwrites\n"
+			# figure out which roles or members changed
+			changed_rm = set()
+			removed_rm = set()
+			added_rm = set()
+			for role_or_member in before.overwrites: # dict[rm] = po
+				if role_or_member in after.overwrites: # dict[rm] = po
+					changed_rm.add(role_or_member)
+				else:
+					removed_rm.add(role_or_member)
+			for role_or_member in after.overwrites:
+				if role_or_member not in before.overwrites:
+					added_rm.add(role_or_member)
+			# compare changed perms
+			for rm in added_rm:
+				overwrites_added = after.overwrites[rm]
+				for overwrite in overwrites_added:
+					for perm, value in overwrite:
+						embed.description += f"+ {perm}: {value}\n"
+			for rm in changed_rm:
+				pb = set(before.overwrites[rm]) # PermissionOverwrite set
+				pa = set(after.overwrites[rm]) # aka {(perm, value),(...)}
+				overwrites_added = pa - pb 
+				overwrites_removed = pb - pa
+				for overwrite in overwrites_added:
+					for perm, value in overwrite:
+						embed.description += f"+ {perm}: {value}\n"
+				for overwrite in overwrites_removed:
+					for perm, value in overwrite:
+						embed.description += f"- {perm}: {value}\n"
+			for rm in removed_rm:
+				overwrites_removed = before.overwrites[rm]
+				for overwrite in overwrites_removed:
+					for perm, value in overwrite:
+						embed.description += f"- {perm}: {value}\n"				
 
 		if after.permissions_synced and not before.permissions_synced:
 			embed.description += f"- Permissions for {after.mention} were synced with {after.category}\n"
