@@ -99,6 +99,7 @@ class Audit(Cog):
 	# 		)
 	# 	)
 
+	@Cog.listener()
 	async def on_message_edit(self, before, after):
 		"""Log edited and updated messages (if in cache)"""
 
