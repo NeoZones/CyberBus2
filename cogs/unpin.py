@@ -12,7 +12,7 @@ class Unpin(Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.guild = bot.get_guild(int(getenv("GUILD_ID")))
+		self.guild = self.bot.get_guild(int(getenv("GUILD_ID")))
 		# load cache from pickle if it exists
 		filename = '.cache/messages/pins.pickle'
 		self.cache = set()
