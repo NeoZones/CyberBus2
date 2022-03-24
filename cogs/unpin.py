@@ -38,7 +38,7 @@ class Unpin(Cog):
 					if message.id not in self.cache:
 						self.cache.add(message.id)
 			# commit cacheset to file storage
-			with open(filename, 'wb') as f:
+			with open(filename, 'w+b') as f:
 				pickle.dump(self.cache, f)
 		print("Initialized Unpin cog")
 
@@ -65,7 +65,7 @@ class Unpin(Cog):
 					if message.id not in self.cache:
 						self.cache.add(message.id)
 			# commit cacheset to file storage
-			with open(filename, 'wb') as f:
+			with open(filename, 'w+b') as f:
 				pickle.dump(self.cache, f)
 
 	@Cog.listener()
