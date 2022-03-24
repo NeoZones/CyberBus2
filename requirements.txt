@@ -4,8 +4,7 @@ pycord/.
 pycord/.[voice]
 pycord/.[speed]
 asyncio
-youtube-dl
-youtube-search
+yt-dlp
 pynacl
 aiodns
 brotlipy

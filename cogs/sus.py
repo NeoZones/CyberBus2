@@ -23,6 +23,8 @@ class Sus(Cog):
 			|\bamong\sus\b
 			|\bamongus
 			|\bamogus
+			|\bimpostor(?!.*syndrome)
+			|\bimposter(?!.*syndrome)
 			''',
 			re.VERBOSE | re.IGNORECASE
 			)

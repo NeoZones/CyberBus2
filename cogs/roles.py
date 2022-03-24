@@ -176,7 +176,7 @@ class Roles(Cog):
 
 	@slash_command(
 		description="Choose the color of your display name",
-		guild_ids=[getenv("GUILD_ID")]
+		guild_ids=[int(getenv("GUILD_ID"))]
 	)
 	async def color(
 		self,

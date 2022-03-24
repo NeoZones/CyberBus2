@@ -6,7 +6,7 @@ from os import getenv
 from collections import Counter
 import re
 
-GUILD = getenv("GUILD_ID")
+GUILD = int(getenv("GUILD_ID"))
 
 def setup(bot):
 	bot.add_cog(Random(bot))
