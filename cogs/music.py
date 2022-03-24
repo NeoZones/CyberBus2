@@ -7,7 +7,6 @@ from os import getenv # unused - can fetch user/pass for age-restricted videos
 from time import time # performance tracking
 import random # for shuffling the queue
 import math # for ceiling function in queue pages
-import pytube
 
 def setup(bot):
 	bot.add_cog(Music(bot))
