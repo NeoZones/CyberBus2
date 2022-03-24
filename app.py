@@ -75,7 +75,7 @@ def allowed_to_reload(ctx):
 		return False
 	return True
 
-def reload_music():
+def reload_music(ctx):
 	music = bot.get_cog("Music")
 
 	q = music.q
@@ -92,7 +92,7 @@ def reload_music():
 	music.repeat_mode = repeat_mode
 	music.search_results = search_results
 
-def reload_unpin():
+def reload_unpin(ctx):
 	unpin = bot.get_cog("Unpin")
 
 	cache = unpin.cache
@@ -112,9 +112,9 @@ async def reload_prefix(ctx, cog: str = None):
 	if not cog:
 		return await ctx.send("Please specify a cog to reload")
 	elif cog.lower() == "music":
-		reload_music()
+		reload_music(ctx)
 	elif cog.lower() == "unpin":
-		reload_unpin()
+		reload_unpin(ctx)
 	else:
 		bot.reload_extension(f"cogs.{cog}")
 	await ctx.send(f"Reloaded `{cog}` extension")
