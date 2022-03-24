@@ -12,37 +12,6 @@ class Unpin(Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.guild = asyncio.run_coroutine_threadsafe(
-			self.bot.fetch_guild(int(getenv("GUILD_ID"))),
-			self.bot.loop or asyncio.get_event_loop()
-		).result()
-		# load cache from pickle if it exists
-		filename = '.cache/messages/pins.pickle'
-		self.cache = set()
-		if path.getsize(filename) > 0:
-			with open(filename, 'r+b') as f:
-				self.cache = pickle.load(f)
-		else:
-			# get pinned message IDs
-			channels = asyncio.run_coroutine_threadsafe(
-				self.guild.fetch_channels(),
-				self.bot.loop or asyncio.get_event_loop()
-			).result()
-			channels = [channel for channel in channels if channel.type == discord.ChannelType.text]
-			for channel in channels:
-				try:
-					pins = asyncio.run_coroutine_threadsafe(
-						channel.pins(),
-						self.bot.loop or asyncio.get_event_loop()
-					).result()
-				except:
-					continue
-				for message in pins:
-					if message.id not in self.cache:
-						self.cache.add(message.id)
-			# commit cacheset to file storage
-			with open(filename, 'w+b') as f:
-				pickle.dump(self.cache, f)
 		print("Initialized Unpin cog")
 
 	@Cog.listener()

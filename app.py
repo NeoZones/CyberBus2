@@ -75,7 +75,7 @@ def allowed_to_reload(ctx):
 		return False
 	return True
 
-def reload_music(ctx):
+def reload_music():
 	music = bot.get_cog("Music")
 
 	q = music.q
@@ -92,6 +92,18 @@ def reload_music(ctx):
 	music.repeat_mode = repeat_mode
 	music.search_results = search_results
 
+def reload_unpin():
+	unpin = bot.get_cog("Unpin")
+
+	cache = unpin.cache
+	guild = unpin.guild
+
+	bot.reload_extension(f"cogs.unpin")
+
+	unpin = bot.get_cog("Unpin")
+	unpin.cache = cache
+	unpin.guild = guild
+
 @bot.command(name='reload')
 async def reload_prefix(ctx, cog: str = None):
 	"""Reload an extension (admin command)"""
@@ -99,8 +111,10 @@ async def reload_prefix(ctx, cog: str = None):
 		return await ctx.send("You must be an admin or bot owner to use this command")
 	if not cog:
 		return await ctx.send("Please specify a cog to reload")
-	elif cog == "music":
-		reload_music(ctx)
+	elif cog.lower() == "music":
+		reload_music()
+	elif cog.lower() == "unpin":
+		reload_unpin()
 	else:
 		bot.reload_extension(f"cogs.{cog}")
 	await ctx.send(f"Reloaded `{cog}` extension")
