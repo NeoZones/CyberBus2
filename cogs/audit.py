@@ -121,11 +121,11 @@ class Audit(Cog):
 			embed.description = "Content was changed"
 			embed = embed.add_field(
 				name = "Before",
-				value = before.content,
+				value = before.content if before.content else "[No content]",
 				inline = False,
 			).add_field(
 				name = "After",
-				value = after.content,
+				value = after.content if after.content else "[No content]",
 				inline = False,
 			)
 			return await self.channel.send(embed=embed)
@@ -134,7 +134,7 @@ class Audit(Cog):
 			embed.description = "Embed was removed"
 			embed = embed.add_field(
 				name = "Content",
-				value = after.content,
+				value = after.content if after.content else "[No content]",
 			)
 			return await self.channel.send(embed=embed)
 			
