@@ -318,6 +318,8 @@ class Music(Cog):
 				).add_field(
 					name = "Uploaded by",
 					value = uploader,
+				).set_thumbnail(
+					url = image,
 				)
 			)
 

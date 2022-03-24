@@ -103,7 +103,10 @@ class Audit(Cog):
 	async def on_message_edit(self, before, after):
 		"""Log edited and updated messages (if in cache)"""
 
-		if after.author.id == 823849032908668998: # SocialFeeds#0000
+		if after.author.id in [
+			823849032908668998, # SocialFeeds#0000
+			647368715742216193, # SaucyBot
+		]:
 			return
 
 		embed = discord.Embed(
