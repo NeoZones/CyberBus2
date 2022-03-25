@@ -53,7 +53,7 @@ class Player(discord.PCMVolumeTransformer):
 	async def prepare_file(cls, track, *, loop):
 		loop = loop or asyncio.get_event_loop()
 		logger.info(f"Preparing player from file: {track.source}")
-		return cls(track.source, track.duration, data = data)
+		return cls(track.source, track.duration, data = track.data)
 
 	@classmethod
 	async def prepare_stream(cls, track, *, loop):
@@ -419,7 +419,7 @@ class Music(Cog):
 		else:
 			player = await Player.prepare_file(self.track, loop = self.bot.loop)
 		
-		logging.info("playing Player on the voice client")
+		logger.info("playing Player on the voice client")
 		ctx.voice_client.play(
 			player,
 			after=lambda e: self.after(ctx)
@@ -476,7 +476,7 @@ class Music(Cog):
 		if not ctx.voice_client:
 			logger.warning("no voice client")
 			if ctx.author.voice:
-				logging.info(f"moving voice client to {ctx.author.voice.channel}")
+				logger.info(f"moving voice client to {ctx.author.voice.channel}")
 				await ctx.author.voice.channel.connect()
 			else:
 				msg = await ctx.send(
@@ -580,7 +580,7 @@ class Music(Cog):
 		if not self.track:
 			msg = await ctx.send("Nothing is currently playing")
 			if msg:
-				logging.info("Nothing is currently playing")
+				logger.info("Nothing is currently playing")
 			return
 		source = ctx.voice_client.source
 		embed = discord.Embed(
