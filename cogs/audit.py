@@ -172,7 +172,7 @@ class Audit(Cog):
 			
 		logger.debug(f"{hash(before)=}")
 		logger.debug(f"{hash(after)=}")
-		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('_')]
 		for attr in attrs:
 			logging.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
@@ -472,7 +472,7 @@ class Audit(Cog):
 			logger.warning("on_guild_channel_update had no changes detected\n")
 			logger.debug(f"{hash(before)=}")
 			logger.debug(f"{hash(after)=}")
-			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('_')]
 			for attr in attrs:
 				logging.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
@@ -781,7 +781,7 @@ class Audit(Cog):
 
 		logger.debug(f"{hash(before)=}")
 		logger.debug(f"{hash(after)=}")
-		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('_')]
 		for attr in attrs:
 			logging.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
@@ -916,7 +916,7 @@ class Audit(Cog):
 		if embed.description == "The following changes were made:\n":
 			logger.debug(f"{hash(before)=}")
 			logger.debug(f"{hash(after)=}")
-			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('_')]
 			for attr in attrs:
 				logging.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
