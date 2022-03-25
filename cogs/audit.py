@@ -302,14 +302,14 @@ class Audit(Cog):
 			)
 
 		if before.name != after.name:
-			logging.info("changed_roles not equal")
+			logging.info("name not equal")
 			embed.description += f"- Channel name changed from `{before.name}` to `{after.name}`\n"
 			embed.set_author(
 				name = f"#{before.name} -> {after.name}"
 			)
 
 		if before.category_id != after.category_id:
-			logging.info("changed_roles not equal")
+			logging.info("category_id not equal")
 			logging.debug(f"{before.category_id=}")
 			logging.debug(f"{after.category_id=}")
 			embed.description += f"- {after.mention} changed category from {before.category} to {after.category}\n"
@@ -323,6 +323,8 @@ class Audit(Cog):
 			roles_added = roles_after - roles_before
 			roles_removed = roles_before - roles_after
 			if roles_added or roles_removed:
+				logging.debug(f"{roles_added=}")
+				logging.debug(f"{roles_removed=}")
 				embed.description += f"- {after.mention} changed roles\n"
 				for role in roles_added:
 					embed.description += f"  + {role}\n"
@@ -366,25 +368,36 @@ class Audit(Cog):
 				if role_or_member not in before.overwrites:
 					added_rm.add(role_or_member)
 			# compare changed perms
+			logging.debug(f"{added_rm=}")
 			for rm in added_rm:
 				overwrites_added = after.overwrites[rm]
+				logging.debug(f"{overwrites_added=}")
 				for overwrite in overwrites_added:
+					logging.debug(f"{overwrite=}")
 					for perm, value in overwrite:
 						embed.description += f"+ {perm}: {value}\n"
+			logging.debug(f"{changed_rm=}")
 			for rm in changed_rm:
 				pb = set(before.overwrites[rm]) # PermissionOverwrite set
 				pa = set(after.overwrites[rm]) # aka {(perm, value),(...)}
 				overwrites_added = pa - pb 
 				overwrites_removed = pb - pa
+				logging.debug(f"{overwrites_added=}")
 				for overwrite in overwrites_added:
+					logging.debug(f"{overwrite=}")
 					for perm, value in overwrite:
 						embed.description += f"+ {perm}: {value}\n"
+				logging.debug(f"{overwrites_removed=}")
 				for overwrite in overwrites_removed:
+					logging.debug(f"{overwrite=}")
 					for perm, value in overwrite:
 						embed.description += f"- {perm}: {value}\n"
+			logging.debug(f"{removed_rm=}")
 			for rm in removed_rm:
 				overwrites_removed = before.overwrites[rm]
+				logging.debug(f"{overwrites_removed=}")
 				for overwrite in overwrites_removed:
+					logging.debug(f"{overwrite=}")
 					for perm, value in overwrite:
 						embed.description += f"- {perm}: {value}\n"				
 
