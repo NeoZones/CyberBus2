@@ -10,6 +10,8 @@ if not path.exists('.logs'):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 fh = logging.FileHandler('.logs/audit.log')
+formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
+fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 def setup(bot):

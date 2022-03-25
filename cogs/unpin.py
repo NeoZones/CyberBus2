@@ -4,6 +4,16 @@ from os import getenv, path, makedirs
 import pickle
 import asyncio
 
+if not path.exists('.logs'):
+	makedirs('.logs')
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('.logs/unpin.log')
+formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
 def setup(bot):
 	bot.add_cog(Unpin(bot))
 
@@ -51,6 +61,7 @@ class Unpin(Cog):
 		url = f"https://discord.com/channels/{guild_id}/{channel_id}/{message_id}"
 
 		if "pinned" not in payload.data:
+			logger.info("ignoring partial update with no payload.data.pinned")
 			return
 		
 		pinned_after = payload.data['pinned']
@@ -61,7 +72,7 @@ class Unpin(Cog):
 		if pinned_before and not pinned_after: # Generate a notice for unpinned messages
 			channel = self.bot.get_channel(channel_id)
 			message = payload.cached_message or await channel.fetch_message(message_id)
-			await channel.send(
+			msg = await channel.send(
 				embed = discord.Embed(
 					title = "Message unpinned",
 					url = url
@@ -69,3 +80,5 @@ class Unpin(Cog):
 				reference = message,
 				mention_author = False
 			)
+			if msg:
+				logger.info(f"Message unpinned: {url}")
