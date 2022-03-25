@@ -125,7 +125,7 @@ class Audit(Cog):
 			823849032908668998, # SocialFeeds#0000
 			647368715742216193, # SaucyBot
 		]:
-			logger.info("on_message_edit ignored\n")
+			logger.info("on_message_edit ignored: socialfeeds or saucybot\n")
 			return
 
 		embed = discord.Embed(
@@ -138,6 +138,10 @@ class Audit(Cog):
 		).set_footer(
 			text = f"Message ID: {after.id} | Channel ID: {after.channel.id}",
 		)
+
+		if before.embeds != after.embeds and after.embeds and not before.embeds: # embeds added
+			logger.info("on_message_edit ignored: embeds were added\n")
+			return # we don't care
 
 		if before.content != after.content: # content changed
 			logger.info("content was changed")
