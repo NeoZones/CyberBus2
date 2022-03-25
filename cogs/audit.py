@@ -49,7 +49,7 @@ class Audit(Cog):
 	 			self.bot.user.id,
 			]
 		):
-			logger.info("on_message_delete ignored")
+			logger.info("on_message_delete ignored\n")
 			return # ignore deleted messages from the above members
 
 		msg = await self.channel.send(
@@ -72,7 +72,7 @@ class Audit(Cog):
 			)
 		)
 		if msg:
-			logger.info("on_message_delete sent to channel")
+			logger.info("on_message_delete sent to channel\n")
 
 	# @Cog.listener()
 	# async def on_raw_message_delete(self, payload):
@@ -125,7 +125,7 @@ class Audit(Cog):
 			823849032908668998, # SocialFeeds#0000
 			647368715742216193, # SaucyBot
 		]:
-			logger.info("on_message_edit ignored")
+			logger.info("on_message_edit ignored\n")
 			return
 
 		embed = discord.Embed(
@@ -153,7 +153,7 @@ class Audit(Cog):
 			)
 			msg = await self.channel.send(embed=embed)
 			if msg:
-				logger.info("on_message_edit sent to channel")
+				logger.info("on_message_edit sent to channel\n")
 			return
 
 		if before.embeds != after.embeds and before.embeds and not after.embeds: # embeds removed
@@ -165,7 +165,7 @@ class Audit(Cog):
 			)
 			msg = await self.channel.send(embed=embed)
 			if msg:
-				logger.info("on_message_edit sent to channel")
+				logger.info("on_message_edit sent to channel\n")
 			return
 			
 
@@ -267,7 +267,7 @@ class Audit(Cog):
 			)
 		)
 		if msg:
-			logger.info("on_guild_channel_create sent to channel")
+			logger.info("on_guild_channel_create sent to channel\n")
 
 	@Cog.listener()
 	async def on_guild_channel_delete(self, channel):
@@ -285,7 +285,7 @@ class Audit(Cog):
 			)
 		)
 		if msg:
-			logger.info("on_guild_channel_delete sent to channel")
+			logger.info("on_guild_channel_delete sent to channel\n")
 
 	@Cog.listener()
 	async def on_guild_channel_update(self, before, after):
@@ -294,7 +294,7 @@ class Audit(Cog):
 		logger.debug(f"{before=}")
 		logger.debug(f"{after=}")
 		if after.id == 857144133742493736: # minecraft channel
-			logger.info("on_guild_channel_update ignored")
+			logger.info("on_guild_channel_update ignored\n")
 			return
 
 		url = f"https://discord.com/channels/{after.guild.id}/{after.id}"
@@ -455,12 +455,12 @@ class Audit(Cog):
 		# 		pass
 
 		if embed.description == "The following changes were made:\n":
-			logger.warning("on_guild_channel_update had no changed detected")
+			logger.warning("on_guild_channel_update had no changed detected\n")
 			return # the change made is one we don't care about or haven't handled
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_guild_channel_update sent to channel")
+			logger.info("on_guild_channel_update sent to channel\n")
 
 	# @Cog.listener()
 	# async def on_guild_channel_pins_update(self, channel, last_pin):
@@ -517,7 +517,7 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_integration_create sent to channel")
+			logger.info("on_integration_create sent to channel\n")
 
 	@Cog.listener()
 	async def on_integration_update(self, integration):
@@ -551,7 +551,7 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_integration_update sent to channel")
+			logger.info("on_integration_update sent to channel\n")
 
 	@Cog.listener()
 	async def on_raw_integration_delete(self, payload):
@@ -574,7 +574,7 @@ class Audit(Cog):
 			)
 		)
 		if msg:
-			logger.info("on_raw_integration_delete sent to channel")
+			logger.info("on_raw_integration_delete sent to channel\n")
 
 	# MEMBERS ===================================================================
 
@@ -618,7 +618,7 @@ class Audit(Cog):
 			)
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 		
 		if before.roles != after.roles: # tested working
@@ -646,7 +646,7 @@ class Audit(Cog):
 			)
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 
 		if before.name != after.name or before.discriminator != after.discriminator:
@@ -665,7 +665,7 @@ class Audit(Cog):
 			)
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 
 		if before.display_avatar != after.display_avatar:
@@ -682,7 +682,7 @@ class Audit(Cog):
 			)
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 
 		if after.timed_out and not before.timed_out: # idk how to time out people
@@ -690,7 +690,7 @@ class Audit(Cog):
 			embed.description = f"{after.mention} is now timed out"
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 			
 		elif before.timed_out and not after.timed_out:
@@ -698,7 +698,7 @@ class Audit(Cog):
 			embed.description = f"{after.mention} is no longer timed out"
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 
 		elif before.communication_disabled_until != after.communication_disabled_until:
@@ -715,7 +715,7 @@ class Audit(Cog):
 			)
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 
 		if before.guild_permissions != after.guild_permissions: # when?
@@ -751,7 +751,7 @@ class Audit(Cog):
 				)
 			msg =  await self.channel.send(embed = embed)
 			if msg:
-				logger.info("on_member_update sent to channel")
+				logger.info("on_member_update sent to channel\n")
 			return
 
 	# ROLES =====================================================================
@@ -776,7 +776,7 @@ class Audit(Cog):
 			)
 		)
 		if msg:
-			logger.info("on_guild_role_create sent to channel")
+			logger.info("on_guild_role_create sent to channel\n")
 
 	@Cog.listener()
 	async def on_guild_role_delete(self, role):
@@ -798,7 +798,7 @@ class Audit(Cog):
 			)
 		)
 		if msg:
-			logger.info("on_guild_role_delete sent to channel")
+			logger.info("on_guild_role_delete sent to channel\n")
 
 	@Cog.listener()
 	async def on_guild_role_update(self, before, after):
@@ -877,7 +877,7 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_guild_role_update sent to channel")
+			logger.info("on_guild_role_update sent to channel\n")
 
 	# EMOJIS AND STICKERS =======================================================
 
@@ -915,7 +915,7 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_guild_emojis_update sent to channel")
+			logger.info("on_guild_emojis_update sent to channel\n")
 
 	@Cog.listener()
 	async def on_guild_stickers_update(self, guild, before, after):
@@ -948,7 +948,7 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_guild_stickers_update sent to channel")
+			logger.info("on_guild_stickers_update sent to channel\n")
 
 	# INVITES ===================================================================
 
@@ -985,7 +985,7 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_invite_create sent to channel")
+			logger.info("on_invite_create sent to channel\n")
 
 	@Cog.listener()
 	async def on_invite_delete(self, invite):
@@ -1017,4 +1017,4 @@ class Audit(Cog):
 
 		msg = await self.channel.send(embed = embed)
 		if msg:
-			logger.info("on_invite_delete sent to channel")
+			logger.info("on_invite_delete sent to channel\n")
