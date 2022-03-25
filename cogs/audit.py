@@ -170,17 +170,18 @@ class Audit(Cog):
 				logger.info("on_message_edit sent to channel\n")
 			return
 			
-		logger.warning("Event not handled")
 		logger.debug(f"{hash(before)=}")
 		logger.debug(f"{hash(after)=}")
 		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
 		for attr in attrs:
+			logging.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
 			value_after = getattr(after, attr)
 			if value_before != value_after:
 				logger.warning(f"{attr} not equal")
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
+		logger.warning("Event not handled\n")
 
 	# @Cog.listener()
 	# async def on_raw_message_edit(self, payload):
@@ -473,6 +474,7 @@ class Audit(Cog):
 			logger.debug(f"{hash(after)=}")
 			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
 			for attr in attrs:
+				logging.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
 				value_after = getattr(after, attr)
 				if value_before != value_after:
@@ -777,17 +779,18 @@ class Audit(Cog):
 				logger.info("on_member_update sent to channel\n")
 			return
 
-		logger.warning("Event not handled")
 		logger.debug(f"{hash(before)=}")
 		logger.debug(f"{hash(after)=}")
 		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
 		for attr in attrs:
+			logging.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
 			value_after = getattr(after, attr)
 			if value_before != value_after:
 				logger.warning(f"{attr} not equal")
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
+		logger.warning("Event not handled\n")
 
 	# ROLES =====================================================================
 
@@ -911,17 +914,18 @@ class Audit(Cog):
 				)
 
 		if embed.description == "The following changes were made:\n":
-			logger.warning("Event not handled")
 			logger.debug(f"{hash(before)=}")
 			logger.debug(f"{hash(after)=}")
 			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
 			for attr in attrs:
+				logging.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
 				value_after = getattr(after, attr)
 				if value_before != value_after:
 					logger.warning(f"{attr} not equal")
 					logger.debug(f"{value_before=}")
 					logger.debug(f"{value_after=}")
+			logger.warning("Event not handled\n")
 			return
 
 		msg = await self.channel.send(embed = embed)
