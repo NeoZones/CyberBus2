@@ -1,8 +1,11 @@
 import discord
 from discord.ext.commands import Cog
-from os import getenv
+from os import getenv, path, makedirs
 from datetime import timedelta
 import logging
+
+if not path.exists('.logs'):
+	makedirs('.logs')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

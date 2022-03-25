@@ -1,6 +1,6 @@
 import discord
 from discord.ext.commands import Cog
-from os import getenv, path
+from os import getenv, path, makedirs
 import pickle
 import asyncio
 
@@ -19,6 +19,8 @@ class Unpin(Cog):
 		await self.bot.wait_until_ready()
 		self.guild = await self.bot.fetch_guild(int(getenv("GUILD_ID")))
 		# load cache from pickle if it exists
+		if not path.exists('.cache/messages'):
+			makedirs('.cache/messages')
 		filename = '.cache/messages/pins.pickle'
 		self.cache = set()
 		if path.getsize(filename) > 0:
