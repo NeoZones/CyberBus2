@@ -158,6 +158,8 @@ class Audit(Cog):
 
 		if before.embeds != after.embeds and before.embeds and not after.embeds: # embeds removed
 			logger.info("embed was changed")
+			logger.debug(f"{before.embeds=}")
+			logger.debug(f"{after.embeds=}")
 			embed.description = "Embed was removed"
 			embed = embed.add_field(
 				name = "Content",
@@ -168,6 +170,17 @@ class Audit(Cog):
 				logger.info("on_message_edit sent to channel\n")
 			return
 			
+		logger.warning("Event not handled")
+		logger.debug(f"{hash(before)=}")
+		logger.debug(f"{hash(after)=}")
+		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+		for attr in attrs:
+			value_before = getattr(before, attr)
+			value_after = getattr(after, attr)
+			if value_before != value_after:
+				logger.warning(f"{attr} not equal")
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
 
 	# @Cog.listener()
 	# async def on_raw_message_edit(self, payload):
@@ -455,7 +468,17 @@ class Audit(Cog):
 		# 		pass
 
 		if embed.description == "The following changes were made:\n":
-			logger.warning("on_guild_channel_update had no changed detected\n")
+			logger.warning("on_guild_channel_update had no changes detected\n")
+			logger.debug(f"{hash(before)=}")
+			logger.debug(f"{hash(after)=}")
+			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+			for attr in attrs:
+				value_before = getattr(before, attr)
+				value_after = getattr(after, attr)
+				if value_before != value_after:
+					logger.warning(f"{attr} not equal")
+					logger.debug(f"{value_before=}")
+					logger.debug(f"{value_after=}")
 			return # the change made is one we don't care about or haven't handled
 
 		msg = await self.channel.send(embed = embed)
@@ -754,6 +777,18 @@ class Audit(Cog):
 				logger.info("on_member_update sent to channel\n")
 			return
 
+		logger.warning("Event not handled")
+		logger.debug(f"{hash(before)=}")
+		logger.debug(f"{hash(after)=}")
+		attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+		for attr in attrs:
+			value_before = getattr(before, attr)
+			value_after = getattr(after, attr)
+			if value_before != value_after:
+				logger.warning(f"{attr} not equal")
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
+
 	# ROLES =====================================================================
 
 	@Cog.listener()
@@ -875,6 +910,20 @@ class Audit(Cog):
 					value = "\n".join(removed_permissions)
 				)
 
+		if embed.description == "The following changes were made:\n":
+			logger.warning("Event not handled")
+			logger.debug(f"{hash(before)=}")
+			logger.debug(f"{hash(after)=}")
+			attrs = [f for f in dir(after) if not callable(getattr(after,f)) and not f.startswith('__')]
+			for attr in attrs:
+				value_before = getattr(before, attr)
+				value_after = getattr(after, attr)
+				if value_before != value_after:
+					logger.warning(f"{attr} not equal")
+					logger.debug(f"{value_before=}")
+					logger.debug(f"{value_after=}")
+			return
+
 		msg = await self.channel.send(embed = embed)
 		if msg:
 			logger.info("on_guild_role_update sent to channel\n")
@@ -896,6 +945,10 @@ class Audit(Cog):
 		after_set = set(after)
 		added = after_set - before_set
 		removed = before_set - after_set
+
+		if not added and not removed:
+			logging.warning("No changed detected -- what happened?")
+			return
 
 		added_string = "Added:\n"
 		removed_string = "Removed:\n"
@@ -931,6 +984,10 @@ class Audit(Cog):
 		after_set = set(after)
 		added = after_set - before_set
 		removed = before_set - after_set
+
+		if not added and not removed:
+			logging.warning("No changed detected -- what happened?")
+			return
 
 		added_string = "Added:\n"
 		removed_string = "Removed:\n"
