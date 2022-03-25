@@ -8,6 +8,7 @@ from time import time # performance tracking
 import random # for shuffling the queue
 import math # for ceiling function in queue pages
 from functools import partial
+import logging
 
 if not path.exists('.logs'):
 	makedirs('.logs')

@@ -3,6 +3,7 @@ from discord.ext.commands import Cog
 from os import getenv, path, makedirs
 import pickle
 import asyncio
+import logging
 
 if not path.exists('.logs'):
 	makedirs('.logs')
