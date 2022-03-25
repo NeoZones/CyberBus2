@@ -174,7 +174,7 @@ class Audit(Cog):
 		logger.debug(f"{hash(after)=}")
 		attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
 		for attr in attrs:
-			logging.debug(f"Comparing {attr} in before/after")
+			logger.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
 			value_after = getattr(after, attr)
 			if value_before != value_after:
@@ -474,7 +474,7 @@ class Audit(Cog):
 			logger.debug(f"{hash(after)=}")
 			attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
 			for attr in attrs:
-				logging.debug(f"Comparing {attr} in before/after")
+				logger.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
 				value_after = getattr(after, attr)
 				if value_before != value_after:
@@ -783,7 +783,7 @@ class Audit(Cog):
 		logger.debug(f"{hash(after)=}")
 		attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
 		for attr in attrs:
-			logging.debug(f"Comparing {attr} in before/after")
+			logger.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
 			value_after = getattr(after, attr)
 			if value_before != value_after:
@@ -918,7 +918,7 @@ class Audit(Cog):
 			logger.debug(f"{hash(after)=}")
 			attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
 			for attr in attrs:
-				logging.debug(f"Comparing {attr} in before/after")
+				logger.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
 				value_after = getattr(after, attr)
 				if value_before != value_after:
@@ -951,7 +951,7 @@ class Audit(Cog):
 		removed = before_set - after_set
 
 		if not added and not removed:
-			logging.warning("No changed detected -- what happened?")
+			logger.warning("No changed detected -- what happened?")
 			return
 
 		added_string = "Added:\n"
@@ -990,7 +990,7 @@ class Audit(Cog):
 		removed = before_set - after_set
 
 		if not added and not removed:
-			logging.warning("No changed detected -- what happened?")
+			logger.warning("No changed detected -- what happened?")
 			return
 
 		added_string = "Added:\n"
