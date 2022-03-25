@@ -144,7 +144,7 @@ class Music(Cog):
 	@command(aliases=['start', 'summon', 'connect'])
 	async def join(self, ctx, *, channel: discord.VoiceChannel = None):
 		"""Joins a voice channel"""
-		logger.info(".join", f" {channel}" if channel else "")
+		logger.info(f".join {channel}" if channel else ".join")
 		if not channel: # Upon a raw "join" command without a channel specified,
 			if not ctx.author.voice:
 				msg =  await ctx.send(
@@ -529,13 +529,13 @@ class Music(Cog):
 	@command(aliases=['p', 'listen'])
 	async def play(self, ctx, *, query):
 		"""Add track(s) to queue"""
-		logger.info(".play", f" {query}" if query else "")
+		logger.info(f".play {query}")
 		return await self.add_to_queue(ctx, query, top=False)
 
 	@command(aliases=['ptop', 'top'])
 	async def playtop(self, ctx, *, query):
 		"""Add tracks to top of queue"""
-		logger.info(".playtop", f" {query}" if query else "")
+		logger.info(f".playtop {query}")
 		return await self.add_to_queue(ctx, query, top=True)
 	
 	# TODO: repeat once, repeat all, repeat none (repeat/loop command)
@@ -552,7 +552,7 @@ class Music(Cog):
 	@command(aliases=['q'])
 	async def queue(self, ctx, p: int = 1):
 		"""Show tracks up next"""
-		logger.info(".queue", f" {p}" if p else "")
+		logger.info(f".queue {p}" if p else ".queue")
 		if not self.q and not self.track:
 			msg = await ctx.send("The queue is currently empty.")
 			logger.info("Message sent: The queue is currently empty.")
@@ -622,7 +622,7 @@ class Music(Cog):
 	@command()
 	async def remove(self, ctx, i):
 		"""Remove track at given position"""
-		logger.info(".remove", f" {i}" if i else "")
+		logger.info(f".remove {i}")
 		i = int(i) - 1
 		track = self.q.pop(i)
 		msg = await ctx.send(f"Removed: {track.title}")
@@ -685,7 +685,7 @@ class Music(Cog):
 	@command(aliases=['v', 'vol'])
 	async def volume(self, ctx, volume: int):
 		"""Changes the player's volume"""
-		logger.info(".volume", f" {volume}" if volume else "")
+		logger.info(f".volume {volume}")
 		if ctx.voice_client is None:
 			return await ctx.send("Not connected to a voice channel.")
 		if volume not in range(101):
@@ -696,7 +696,7 @@ class Music(Cog):
 	@command(aliases=['list'])
 	async def catalogue(self, ctx, subdirectory=""):
 		"""Shows the available local files"""
-		logger.info(".catalogue", f" {subdirectory}" if subdirectory else "")
+		logger.info(f".catalogue {subdirectory}" if subdirectory else ".catalogue")
 		if "../" in subdirectory:
 			return await ctx.send(f"Nice try, but that won't work.")
 		path = "."
