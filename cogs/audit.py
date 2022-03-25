@@ -2,6 +2,9 @@ import discord
 from discord.ext.commands import Cog
 from os import getenv
 from datetime import timedelta
+import logging
+
+logging.basicConfig(filename='log.txt', encoding='utf-8', level=logging.DEBUG)
 
 def setup(bot):
 	bot.add_cog(Audit(bot))
@@ -30,15 +33,18 @@ class Audit(Cog):
 	@Cog.listener()
 	async def on_message_delete(self, message):
 		"""Log deleted messages (if in cache)"""
+		logging.info("on_message_delete received")
+		logging.debug(f"{message=}")
 		if message.author.id in set(
 			[
 				647368715742216193, # SaucyBot
 	 			self.bot.user.id,
 			]
 		):
+			logging.info("on_message_delete ignored")
 			return # ignore deleted messages from the above members
 
-		await self.channel.send(
+		msg = await self.channel.send(
 			embed = discord.Embed(
 				title = "Message deleted",
 				colour = 0xff0000,
@@ -57,6 +63,8 @@ class Audit(Cog):
 				text = f"Message {message.id} in channel {message.channel.id} was deleted",
 			)
 		)
+		if msg:
+			logging.info("on_message_delete sent to channel")
 
 	# @Cog.listener()
 	# async def on_raw_message_delete(self, payload):
@@ -102,11 +110,14 @@ class Audit(Cog):
 	@Cog.listener()
 	async def on_message_edit(self, before, after):
 		"""Log edited and updated messages (if in cache)"""
-
+		logging.info("on_message_edit received")
+		logging.debug(f"{before=}")
+		logging.debug(f"{after=}")
 		if after.author.id in [
 			823849032908668998, # SocialFeeds#0000
 			647368715742216193, # SaucyBot
 		]:
+			logging.info("on_message_edit ignored")
 			return
 
 		embed = discord.Embed(
@@ -121,6 +132,7 @@ class Audit(Cog):
 		)
 
 		if before.content != after.content: # content changed
+			logging.info("content was changed")
 			embed.description = "Content was changed"
 			embed = embed.add_field(
 				name = "Before",
@@ -131,15 +143,22 @@ class Audit(Cog):
 				value = after.content if after.content else "[No content]",
 				inline = False,
 			)
-			return await self.channel.send(embed=embed)
+			msg = await self.channel.send(embed=embed)
+			if msg:
+				logging.info("on_message_edit sent to channel")
+			return
 
 		if before.embeds != after.embeds and before.embeds and not after.embeds: # embeds removed
+			logging.info("embed was changed")
 			embed.description = "Embed was removed"
 			embed = embed.add_field(
 				name = "Content",
 				value = after.content if after.content else "[No content]",
 			)
-			return await self.channel.send(embed=embed)
+			msg = await self.channel.send(embed=embed)
+			if msg:
+				logging.info("on_message_edit sent to channel")
+			return
 			
 
 	# @Cog.listener()
@@ -224,9 +243,10 @@ class Audit(Cog):
 	@Cog.listener()
 	async def on_guild_channel_create(self, channel):
 		"""Log created channels"""
+		logging.info("on_guild_channel_create received")
+		logging.debug(f"{channel=}")
 		url = f"https://discord.com/channels/{channel.guild.id}/{channel.id}"
-
-		await self.channel.send(
+		msg = await self.channel.send(
 			embed = discord.Embed(
 				title = "Channel created",
 				url = url,
@@ -238,11 +258,15 @@ class Audit(Cog):
 				text = f"The channel {channel.id} was created",
 			)
 		)
+		if msg:
+			logging.info("on_guild_channel_create sent to channel")
 
 	@Cog.listener()
 	async def on_guild_channel_delete(self, channel):
 		"""Log deleted channels"""
-		await self.channel.send(
+		logging.info("on_guild_channel_delete received")
+		logging.debug(f"{channel=}")
+		msg = await self.channel.send(
 			embed = discord.Embed(
 				title = "Channel deleted",
 				colour = 0xff0000,
@@ -252,11 +276,17 @@ class Audit(Cog):
 				text = f"The channel {channel.id} was deleted",
 			)
 		)
+		if msg:
+			logging.info("on_guild_channel_delete sent to channel")
 
 	@Cog.listener()
 	async def on_guild_channel_update(self, before, after):
 		"""Log updated channels"""
+		logging.info("on_guild_channel_update received")
+		logging.debug(f"{before=}")
+		logging.debug(f"{after=}")
 		if after.id == 857144133742493736: # minecraft channel
+			logging.info("on_guild_channel_update ignored")
 			return
 
 		url = f"https://discord.com/channels/{after.guild.id}/{after.id}"
@@ -272,38 +302,56 @@ class Audit(Cog):
 			)
 
 		if before.name != after.name:
+			logging.info("changed_roles not equal")
 			embed.description += f"- Channel name changed from `{before.name}` to `{after.name}`\n"
 			embed.set_author(
 				name = f"#{before.name} -> {after.name}"
 			)
 
 		if before.category_id != after.category_id:
+			logging.info("changed_roles not equal")
+			logging.debug(f"{before.category_id=}")
+			logging.debug(f"{after.category_id=}")
 			embed.description += f"- {after.mention} changed category from {before.category} to {after.category}\n"
 		
 		if before.changed_roles != after.changed_roles:
+			logging.info("changed_roles not equal")
+			logging.debug(f"{before.changed_roles=}")
+			logging.debug(f"{after.changed_roles=}")
 			roles_before = set(before.changed_roles)
 			roles_after = set(after.changed_roles)
 			roles_added = roles_after - roles_before
 			roles_removed = roles_before - roles_after
-			embed.description += f"- {after.mention} changed roles\n"
-
-			for role in roles_added:
-				embed.description += f"  + {role}\n"
-			for role in roles_removed:
-				embed.description += f"  - {role}\n"
+			if roles_added or roles_removed:
+				embed.description += f"- {after.mention} changed roles\n"
+				for role in roles_added:
+					embed.description += f"  + {role}\n"
+				for role in roles_removed:
+					embed.description += f"  - {role}\n"
 
 		if before.default_auto_archive_duration != after.default_auto_archive_duration:
+			logging.info("default_auto_archive_duration not equal")
+			logging.debug(f"{before.default_auto_archive_duration=}")
+			logging.debug(f"{after.default_auto_archive_duration=}")
 			embed.description += f"- {after.mention} changed auto-archive duration from {before.default_auto_archive_duration} minutes to {after.default_auto_archive_duration} minutes\n"
 
 		if before.members != after.members:
+			logging.info("members not equal")
+			logging.debug(f"{before.members=}")
+			logging.debug(f"{after.members=}")
 			embed.description += f"- {after.mention} changed members from {before.members} to {after.members}\n"
 
 		if after.nsfw and not before.nsfw:
+			logging.info("nsfw: false -> true")
 			embed.description += f"- {after.mention} was marked as NSFW\n"
 		if before.nsfw and not after.nsfw:
+			logging.info("nsfw: true -> false")
 			embed.description += f"- {after.mention} was unmarked as NSFW\n"
 
 		if before.overwrites != after.overwrites:
+			logging.info("overwrites not equal")
+			logging.debug(f"{before.overwrites=}")
+			logging.debug(f"{after.overwrites=}")
 			embed.description += f"- {after.mention} changed overwrites\n"
 			# figure out which roles or members changed
 			changed_rm = set()
@@ -341,14 +389,22 @@ class Audit(Cog):
 						embed.description += f"- {perm}: {value}\n"				
 
 		if after.permissions_synced and not before.permissions_synced:
+			logging.info("permissions_synced: false -> true")
 			embed.description += f"- Permissions for {after.mention} were synced with {after.category}\n"
 		if before.permissions_synced and not after.permissions_synced:
+			logging.info("permissions_synced: true -> false")
 			embed.description += f"- Permissions for {after.mention} were unsynced with {after.category}\n"
 
 		if before.slowmode_delay != after.slowmode_delay:
+			logging.info("slowmode_delay not equal")
+			logging.debug(f"{before.slowmode_delay=}")
+			logging.debug(f"{after.slowmode_delay=}")
 			embed.description += f"- Slowmode delay for {after.mention} was changed from {before.slowmode_delay} seconds to {after.slowmode_delay} seconds\n"
 
 		if before.topic != after.topic:
+			logging.info("topic not equal")
+			logging.debug(f"{before.topic=}")
+			logging.debug(f"{after.topic=}")
 			embed.description += f"- Topic changed for {after.mention}\n"
 			embed = embed.add_field(
 				name = "Before",
@@ -361,6 +417,9 @@ class Audit(Cog):
 			)
 
 		if before.type != after.type:
+			logging.info("type not equal")
+			logging.debug(f"{before.type=}")
+			logging.debug(f"{after.type=}")
 			embed.description = f"- The channel type of {after.mention} was changed from {before.type} to {after.type}\n"
 
 		# if after.type == discord.ChannelType.voice:
@@ -374,9 +433,13 @@ class Audit(Cog):
 		# 	if before.video_quality_mode != after.video_quality_mode:
 		# 		pass
 
-		await self.channel.send(
-			embed = embed
-		)
+		if embed.description == "The following changes were made:\n":
+			logging.warning("on_guild_channel_update had no changed detected")
+			return # the change made is one we don't care about or haven't handled
+
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_guild_channel_update sent to channel")
 
 	# @Cog.listener()
 	# async def on_guild_channel_pins_update(self, channel, last_pin):
@@ -403,6 +466,8 @@ class Audit(Cog):
 	@Cog.listener()
 	async def on_integration_create(self, integration):
 		"""Log created integrations"""
+		logging.info("on_integration_create received")
+		logging.debug(f"{integration=}")
 		embed = discord.Embed(
 			title = "Integration created",
 			description = f"{integration.user} added an integration for {integration.name}",
@@ -429,13 +494,15 @@ class Audit(Cog):
 				icon_url = integration.application.user.display_avatar.url,
 			)
 
-		await self.channel.send(
-			embed = embed
-		)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_integration_create sent to channel")
 
 	@Cog.listener()
 	async def on_integration_update(self, integration):
 		"""Log updated integrations""" # when is this actually called???
+		logging.info("on_integration_update received")
+		logging.debug(f"{integration=}")
 		embed = discord.Embed(
 			title = "Integration updated",
 			colour = 0x00ff00,
@@ -461,15 +528,17 @@ class Audit(Cog):
 				icon_url = integration.application.user.display_avatar.url,
 			)
 
-		await self.channel.send(
-			embed = embed
-		)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_integration_update sent to channel")
 
 	@Cog.listener()
 	async def on_raw_integration_delete(self, payload):
 		"""Log deleted integrations"""
+		logging.info("on_raw_integration_delete received")
+		logging.debug(f"{payload=}")
 		user = await self.bot.fetch_user(payload.application_id)
-		await self.channel.send(
+		msg = await self.channel.send(
 			embed = discord.Embed(
 				title = "Integration deleted",
 				colour = 0xff0000,
@@ -483,6 +552,8 @@ class Audit(Cog):
 				value = f"{user.mention}",
 			)
 		)
+		if msg:
+			logging.info("on_raw_integration_delete sent to channel")
 
 	# MEMBERS ===================================================================
 
@@ -499,6 +570,9 @@ class Audit(Cog):
 	@Cog.listener()
 	async def on_member_update(self, before, after):
 		"""Log updated members (nicknames, roles, timeouts, permissions)"""
+		logging.info("on_member_update received")
+		logging.debug(f"{before=}")
+		logging.debug(f"{after=}")
 		embed = discord.Embed(
 			title = "Member updated",
 			colour = after.colour.value,
@@ -510,6 +584,9 @@ class Audit(Cog):
 		)
 
 		if before.nick != after.nick: # tested working
+			logging.info("nick not equal")
+			logging.debug(f"{before.nick=}")
+			logging.debug(f"{after.nick=}")
 			embed.description = f"{after.mention} had their nickname changed"
 			embed = embed.add_field(
 				name = "Before",
@@ -518,13 +595,21 @@ class Audit(Cog):
 				name = "After",
 				value = after.nick,
 			)
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 		
 		if before.roles != after.roles: # tested working
+			logging.info("roles not equal")
+			logging.debug(f"{before.roles=}")
+			logging.debug(f"{after.roles=}")
 			before_roles = set(before.roles)
 			after_roles = set(after.roles)
 			added_roles = list(after_roles - before_roles)
 			removed_roles = list(before_roles - after_roles)
+			logging.debug(f"{added_roles=}")
+			logging.debug(f"{removed_roles=}")
 			added = "\n".join([role.mention for role in added_roles])
 			removed = "\n".join([role.mention for role in removed_roles])
 			embed.description = f"{after.mention} had their roles updated"
@@ -538,9 +623,17 @@ class Audit(Cog):
 				name = "Removed roles",
 				value = removed,
 			)
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 
 		if before.name != after.name or before.discriminator != after.discriminator:
+			logging.info("name or discriminator not equal")
+			logging.debug(f"{before.name=}")
+			logging.debug(f"{after.name=}")
+			logging.debug(f"{before.discriminator=}")
+			logging.debug(f"{after.discriminator=}")
 			embed.description = f"{after.mention} changed their handle"
 			embed = embed.add_field(
 				name = "Before",
@@ -549,9 +642,15 @@ class Audit(Cog):
 				name = "After",
 				value = after,
 			)
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 
 		if before.display_avatar != after.display_avatar:
+			logging.info("display_avatar not equal")
+			logging.debug(f"{before.display_avatar=}")
+			logging.debug(f"{after.display_avatar=}")
 			embed.description = f"{after.mention} changed their avatar"
 			embed = embed.add_field(
 				name = "Before",
@@ -560,17 +659,31 @@ class Audit(Cog):
 				name = "After",
 				value = after.display_avatar.url,
 			)
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 
 		if after.timed_out and not before.timed_out: # idk how to time out people
+			logging.info("timed_out: false -> true")
 			embed.description = f"{after.mention} is now timed out"
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 			
 		elif before.timed_out and not after.timed_out:
+			logging.info("timed_out: true -> false")
 			embed.description = f"{after.mention} is no longer timed out"
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 
 		elif before.communication_disabled_until != after.communication_disabled_until:
+			logging.info("communication_disabled_until not equal")
+			logging.debug(f"{before.communication_disabled_until=}")
+			logging.debug(f"{after.communication_disabled_until=}")
 			embed.description = f"{after.mention} had their timeout duration changed"
 			embed = embed.add_field(
 				name = "Before",
@@ -579,13 +692,20 @@ class Audit(Cog):
 				name = "After",
 				value = after.communication_disabled_until,
 			)
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 
 		if before.guild_permissions != after.guild_permissions: # when?
+			logging.info("guild_permissions not equal")
+			logging.debug(f"{before.guild_permissions=}")
+			logging.debug(f"{after.guild_permissions=}")
 			changed_permissions = []
 			for b, a in zip(before.guild_permissions, after.guild_permissions):
 				if b != a:
 					changed_permissions.append((b[0], b[1], a[1]))
+			logging.debug(f"{changed_permissions=}")
 			added_permissions = []
 			removed_permissions = []
 			for p in changed_permissions:
@@ -595,6 +715,8 @@ class Audit(Cog):
 				elif value_before and not value_after:
 					removed_permissions.append(perm)
 			if added_permissions or removed_permissions:
+				logging.debug(f"{added_permissions=}")
+				logging.debug(f"{removed_permissions=}")
 				embed.description = f"{after.mention} had their permissions changed"
 			if added_permissions:
 				embed = embed.add_field(
@@ -606,14 +728,19 @@ class Audit(Cog):
 					name = "Permissions removed",
 					value = "\n".join(removed_permissions)
 				)
-			return await self.channel.send(embed = embed)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logging.info("on_member_update sent to channel")
+			return
 
 	# ROLES =====================================================================
 
 	@Cog.listener()
 	async def on_guild_role_create(self, role):
 		"""Log created roles"""
-		await self.channel.send(
+		logging.info("on_guild_role_create received")
+		logging.debug(f"{role=}")
+		msg = await self.channel.send(
 			embed = discord.Embed(
 				title = "Role created",
 				colour = role.colour if role.colour else 0x00ff00,
@@ -627,11 +754,15 @@ class Audit(Cog):
 				value = role.mention,
 			)
 		)
+		if msg:
+			logging.info("on_guild_role_create sent to channel")
 
 	@Cog.listener()
 	async def on_guild_role_delete(self, role):
 		"""Log deleted roles"""
-		await self.channel.send(
+		logging.info("on_guild_role_delete received")
+		logging.debug(f"{role=}")
+		msg = await self.channel.send(
 			embed = discord.Embed(
 				title = "Role deleted",
 				colour = role.colour if role.colour else 0x00ff00,
@@ -645,10 +776,15 @@ class Audit(Cog):
 				value = role.created_at,
 			)
 		)
+		if msg:
+			logging.info("on_guild_role_delete sent to channel")
 
 	@Cog.listener()
 	async def on_guild_role_update(self, before, after):
 		"""Log updated roles"""
+		logging.info("on_guild_role_update received")
+		logging.debug(f"{before=}")
+		logging.debug(f"{after=}")
 		embed = discord.Embed(
 			title = "Role updated",
 			description = "The following changes were made:\n",
@@ -661,6 +797,9 @@ class Audit(Cog):
 		)
 
 		if before.name != after.name:
+			logging.info("name not equal")
+			logging.debug(f"{before.name=}")
+			logging.debug(f"{after.name=}")
 			embed.description = f"- {after.mention} was renamed"
 			embed = embed.add_field(
 				name = "Before",
@@ -671,17 +810,27 @@ class Audit(Cog):
 			)
 
 		if before.colour != after.colour:
+			logging.info("colour not equal")
+			logging.debug(f"{before.colour=}")
+			logging.debug(f"{after.colour=}")
 			embed.description = f"- {after.mention} had its colour changed from {before.colour} to {after.colour}\n"
+
 		if after.hoist and not before.hoist:
+			logging.info("hoist: false -> true")
 			embed.description = f"- {after.mention} was hoisted; it will now show above online users\n"
 		elif before.hoist and not after.hoist:
+			logging.info("hoist: true -> false")
 			embed.description = f"- {after.mention} was unhoisted; it will no longer show above online users\n"
 
 		if before.permissions != after.permissions: # when an integration is updated, e.g.
+			logging.info("permissions not equal")
+			logging.debug(f"{before.permissions=}")
+			logging.debug(f"{after.permissions=}")
 			changed_permissions = []
 			for b, a in zip(before.permissions, after.permissions):
 				if b != a:
 					changed_permissions.append((b[0], b[1], a[1]))
+			logging.debug(f"{changed_permissions=}")
 			added_permissions = []
 			removed_permissions = []
 			for p in changed_permissions:
@@ -693,26 +842,30 @@ class Audit(Cog):
 			if added_permissions or removed_permissions:
 				embed.description = f"{after.mention} had its permissions changed"
 			if added_permissions:
+				logging.debug(f"{added_permissions=}")
 				embed = embed.add_field(
 					name = "Permissions added",
 					value = "\n".join(added_permissions)
 				)
 			if removed_permissions:
+				logging.debug(f"{removed_permissions=}")
 				embed = embed.add_field(
 					name = "Permissions removed",
 					value = "\n".join(removed_permissions)
 				)
-			return await self.channel.send(embed = embed)
 
-		await self.channel.send(
-			embed = embed
-		)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_guild_role_update sent to channel")
 
 	# EMOJIS AND STICKERS =======================================================
 
 	@Cog.listener()
 	async def on_guild_emojis_update(self, guild, before, after):
 		"""Log added or removed emojis"""
+		logging.info("on_guild_emojis_update received")
+		logging.debug(f"{before=}")
+		logging.debug(f"{after=}")
 		embed = discord.Embed(
 			title = "Emoji updated",
 			description = "\n"
@@ -733,15 +886,22 @@ class Audit(Cog):
 			tag = f"<:{emoji.name}:{emoji.id}>"
 			removed_string += f"{tag} - removed by {emoji.user.display_name} ({emoji.user})\n"
 		if added:
+			logging.debug(f"{added=}")
 			embed.description += added_string
 		if removed:
+			logging.debug(f"{removed=}")
 			embed.description += removed_string
 
-		await self.channel.send(embed = embed)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_guild_emojis_update sent to channel")
 
 	@Cog.listener()
 	async def on_guild_stickers_update(self, guild, before, after):
 		"""Log added or removed stickers"""
+		logging.info("on_guild_stickers_update received")
+		logging.debug(f"{before=}")
+		logging.debug(f"{after=}")
 		embed = discord.Embed(
 			title = "Stickers updated",
 		)
@@ -759,17 +919,23 @@ class Audit(Cog):
 		for sticker in removed:
 			removed_string += f"- <:{sticker.name}:{sticker.id}> - {sticker.description}\n"
 		if added:
+			logging.debug(f"{added=}")
 			embed.description += added_string
 		if removed:
+			logging.debug(f"{removed=}")
 			embed.description += removed_string
 
-		await self.channel.send(embed = embed)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_guild_stickers_update sent to channel")
 
 	# INVITES ===================================================================
 
 	@Cog.listener()
 	async def on_invite_create(self, invite):
 		"""Log created invites"""
+		logging.info("on_invite_create received")
+		logging.debug(f"{invite=}")
 		embed = discord.Embed(
 			title = "Invite created",
 			url = invite.url,
@@ -796,11 +962,15 @@ class Audit(Cog):
 		if invite.temporary:
 			embed.description = "(Invite is temporary; anyone joining will be kicked after disconnect"
 
-		await self.channel.send(embed = embed)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_invite_create sent to channel")
 
 	@Cog.listener()
 	async def on_invite_delete(self, invite):
 		"""Log deleted invites"""
+		logging.info("on_invite_delete received")
+		logging.debug(f"{invite=}")
 		embed = discord.Embed(
 			title = "Invite deleted",
 			url = invite.url,
@@ -824,4 +994,6 @@ class Audit(Cog):
 			text = "Invite " + invite.id
 		)
 
-		await self.channel.send(embed = embed)
+		msg = await self.channel.send(embed = embed)
+		if msg:
+			logging.info("on_invite_delete sent to channel")
