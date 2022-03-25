@@ -221,7 +221,7 @@ class Music(Cog):
 		return await self.get_tracks_from_url(ctx, url)
 	
 	async def get_tracks_from_url(self, ctx, url, download=False):
-		logger.debug(f"get_tracks_from_url() called for query: {query}")
+		logger.debug(f"get_tracks_from_url() called for URL: {url}")
 		try:
 			data = ytdl.extract_info(url, download=download)
 			logger.debug(f"{data=}")
