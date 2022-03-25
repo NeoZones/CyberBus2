@@ -719,7 +719,7 @@ class Music(Cog):
 Initialize youtube-dl service.
 """
 import yt_dlp as youtube_dl
-ffmpeg_options = {"options": "-vn"}
+ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"}
 youtube_dl.utils.bug_reports_message = lambda: ""
 ytdl_format_options = {
 	"format": "bestaudio/best",
@@ -734,7 +734,6 @@ ytdl_format_options = {
 	"default_search": "auto",
 	# "source_address": "0.0.0.0", # Bind to ipv4 since ipv6 addresses cause issues
 	"extract_flat": True, # massive speedup for fetching metadata, at the cost of no upload date
-	"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
 }
 username = getenv("YOUTUBE_USERNAME")
 password = getenv("YOUTUBE_PASSWORD")
