@@ -115,7 +115,7 @@ class Track:
 		self.data = data
 	
 	def __repr__(self):
-		return ''.join([f"{key=}\n" for key in self.__dict__])
+		return f"<Track {source=} {requester=} {title=} {duration=} {author=} {author_icon=} {data=}"
 	
 	def __str__(self):
 		title = f"**{self.title}**" if self.title else f"`{self.source}`"
