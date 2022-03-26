@@ -634,7 +634,7 @@ class Audit(Cog):
 		)
 
 		if before == after: # this should never happen but it did once
-			logger.info("on_member_update ignored -- before == after")
+			logger.info("on_member_update ignored -- before == after\n")
 			return # discord wtf are you doing
 
 		if before.nick != after.nick: # tested working
