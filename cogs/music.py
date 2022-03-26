@@ -41,6 +41,7 @@ class Player(discord.PCMVolumeTransformer):
 		duration,
 		*,
 		data = None,
+		ffmpeg_options = {"options": "-vn"},
 	):
 		super().__init__(discord.FFmpegPCMAudio(source, **ffmpeg_options))
 		self.packets_read = 0
@@ -53,7 +54,7 @@ class Player(discord.PCMVolumeTransformer):
 	async def prepare_file(cls, track, *, loop):
 		loop = loop or asyncio.get_event_loop()
 		logger.info(f"Preparing player from file: {track.source}")
-		return cls(track.source, track.duration, data = track.data)
+		return cls(track.source, track.duration, data = track.data, ffmpeg_options = {"options": "-vn"})
 
 	@classmethod
 	async def prepare_stream(cls, track, *, loop):
@@ -62,7 +63,7 @@ class Player(discord.PCMVolumeTransformer):
 		to_run = partial(ytdl.extract_info, url = track.source, download = False)
 		data = await loop.run_in_executor(None, to_run)
 		logger.info(f"Stream URL: {data['url']}")
-		return cls(data['url'], track.duration, data = data)
+		return cls(data['url'], track.duration, data = data, ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"})
 
 
 	def __repr__(self):
@@ -719,7 +720,6 @@ class Music(Cog):
 Initialize youtube-dl service.
 """
 import yt_dlp as youtube_dl
-ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"}
 youtube_dl.utils.bug_reports_message = lambda: ""
 ytdl_format_options = {
 	"format": "bestaudio/best",
