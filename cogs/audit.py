@@ -177,6 +177,9 @@ class Audit(Cog):
 		logger.debug(f"{hash(before)=}")
 		logger.debug(f"{hash(after)=}")
 		attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+		logger.debug(f"{hash(before)=}")
+		logger.debug(f"{hash(after)=}")
+		attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
 		for attr in attrs:
 			logger.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
@@ -185,7 +188,7 @@ class Audit(Cog):
 				logger.warning(f"{attr} not equal")
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
-			subattrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+			subattrs = [f for f in dir(attr) if not f.startswith('_') and not callable(getattr(attr,f))]
 			for subattr in subattrs:
 				logger.debug(f"Comparing {attr}.{subattr} in before/after")
 				value_before = getattr(before, attr)
@@ -805,7 +808,7 @@ class Audit(Cog):
 				logger.warning(f"{attr} not equal")
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
-			subattrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+			subattrs = [f for f in dir(attr) if not f.startswith('_') and not callable(getattr(attr,f))]
 			for subattr in subattrs:
 				logger.debug(f"Comparing {attr}.{subattr} in before/after")
 				value_before = getattr(before, attr)
@@ -951,7 +954,7 @@ class Audit(Cog):
 					logger.warning(f"{attr} not equal")
 					logger.debug(f"{value_before=}")
 					logger.debug(f"{value_after=}")
-				subattrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+				subattrs = [f for f in dir(attr) if not f.startswith('_') and not callable(getattr(attr,f))]
 				for subattr in subattrs:
 					logger.debug(f"Comparing {attr}.{subattr} in before/after")
 					value_before = getattr(before, attr)
