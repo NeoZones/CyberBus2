@@ -185,6 +185,17 @@ class Audit(Cog):
 				logger.warning(f"{attr} not equal")
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
+			subattrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+			for subattr in subattrs:
+				logger.debug(f"Comparing {attr}.{subattr} in before/after")
+				value_before = getattr(before, attr)
+				value_before = getattr(value_before, subattr)
+				value_after = getattr(after, attr)
+				value_after = getattr(value_after, subattr)
+				if value_before != value_after:
+					logger.warning(f"{attr}.{subattr} not equal")
+					logger.debug(f"{value_before=}")
+					logger.debug(f"{value_after=}")
 		logger.warning("Event not handled\n")
 
 	# @Cog.listener()
@@ -697,10 +708,10 @@ class Audit(Cog):
 				logger.info("on_member_update sent to channel\n")
 			return
 
-		if before.display_avatar != after.display_avatar:
-			logger.info("display_avatar not equal")
-			logger.debug(f"{before.display_avatar=}")
-			logger.debug(f"{after.display_avatar=}")
+		if before.display_avatar.url != after.display_avatar.url: # display_avatar alone doesn't work
+			logger.info("display_avatar.url not equal")
+			logger.debug(f"{before.display_avatar.url=}")
+			logger.debug(f"{after.display_avatar.url=}")
 			embed.description = f"{after.mention} changed their avatar"
 			embed = embed.add_field(
 				name = "Before",
@@ -794,6 +805,17 @@ class Audit(Cog):
 				logger.warning(f"{attr} not equal")
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
+			subattrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+			for subattr in subattrs:
+				logger.debug(f"Comparing {attr}.{subattr} in before/after")
+				value_before = getattr(before, attr)
+				value_before = getattr(value_before, subattr)
+				value_after = getattr(after, attr)
+				value_after = getattr(value_after, subattr)
+				if value_before != value_after:
+					logger.warning(f"{attr}.{subattr} not equal")
+					logger.debug(f"{value_before=}")
+					logger.debug(f"{value_after=}")
 		logger.warning("Event not handled\n")
 
 	# ROLES =====================================================================
@@ -929,6 +951,17 @@ class Audit(Cog):
 					logger.warning(f"{attr} not equal")
 					logger.debug(f"{value_before=}")
 					logger.debug(f"{value_after=}")
+				subattrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+				for subattr in subattrs:
+					logger.debug(f"Comparing {attr}.{subattr} in before/after")
+					value_before = getattr(before, attr)
+					value_before = getattr(value_before, subattr)
+					value_after = getattr(after, attr)
+					value_after = getattr(value_after, subattr)
+					if value_before != value_after:
+						logger.warning(f"{attr}.{subattr} not equal")
+						logger.debug(f"{value_before=}")
+						logger.debug(f"{value_after=}")
 			logger.warning("Event not handled\n")
 			return
 
