@@ -633,10 +633,6 @@ class Audit(Cog):
 			text = f"Member ID: {after.id}",
 		)
 
-		if before == after: # this should never happen but it did once
-			logger.info("on_member_update ignored -- before == after\n")
-			return # discord wtf are you doing
-
 		if before.nick != after.nick: # tested working
 			logger.info("nick not equal")
 			logger.debug(f"{before.nick=}")
