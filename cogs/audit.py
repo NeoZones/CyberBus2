@@ -174,28 +174,28 @@ class Audit(Cog):
 				logger.info("on_message_edit sent to channel\n")
 			return
 			
-		# logger.debug(f"{hash(before)=}")
-		# logger.debug(f"{hash(after)=}")
-		# attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
-		# for attr in attrs:
-		# 	logger.debug(f"Comparing {attr} in before/after")
-		# 	value_before = getattr(before, attr)
-		# 	value_after = getattr(after, attr)
-		# 	logger.debug(f"{value_before=}")
-		# 	logger.debug(f"{value_after=}")
-		# 	if value_before != value_after:
-		# 		logger.warning(f"{attr} not equal")
-		# 	subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
-		# 	for subattr in subattrs:
-		# 		logger.debug(f"Comparing {attr}.{subattr} in before/after")
-		# 		value_before = getattr(before, attr)
-		# 		value_before = getattr(value_before, subattr)
-		# 		value_after = getattr(after, attr)
-		# 		value_after = getattr(value_after, subattr)
-		# 		logger.debug(f"{value_before=}")
-		# 		logger.debug(f"{value_after=}")
-		# 		if value_before != value_after:
-		# 			logger.warning(f"{attr}.{subattr} not equal")
+		logger.debug(f"{hash(before)=}")
+		logger.debug(f"{hash(after)=}")
+		attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+		for attr in attrs:
+			logger.debug(f"Comparing {attr} in before/after")
+			value_before = getattr(before, attr)
+			value_after = getattr(after, attr)
+			logger.debug(f"{value_before=}")
+			logger.debug(f"{value_after=}")
+			if value_before != value_after:
+				logger.warning(f"{attr} not equal")
+			subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
+			for subattr in subattrs:
+				logger.debug(f"Comparing {attr}.{subattr} in before/after")
+				value_before = getattr(before, attr)
+				value_before = getattr(value_before, subattr)
+				value_after = getattr(after, attr)
+				value_after = getattr(value_after, subattr)
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
+				if value_before != value_after:
+					logger.warning(f"{attr}.{subattr} not equal")
 		logger.warning("Event not handled\n")
 
 	# @Cog.listener()
@@ -708,7 +708,10 @@ class Audit(Cog):
 				logger.info("on_member_update sent to channel\n")
 			return
 
-		if before.display_avatar.url != after.display_avatar.url: # display_avatar alone doesn't work
+		# haven't gotten this to work... before == after for some reason,
+		# even after updating my avatar multiple times.
+		# maybe on_user_update?
+		if before.display_avatar.url != after.display_avatar.url:
 			logger.info("display_avatar.url not equal")
 			logger.debug(f"{before.display_avatar.url=}")
 			logger.debug(f"{after.display_avatar.url=}")
@@ -817,6 +820,59 @@ class Audit(Cog):
 		# 		if value_before != value_after:
 		# 			logger.warning(f"{attr}.{subattr} not equal")
 		logger.warning("Event not handled\n")
+
+	@Cog.listener()
+	async def on_user_update(self, before, after):
+		"""Log updated users (username, avatar, discriminator)"""
+
+		logger.info("on_user_update received")
+		logger.debug(f"{before=}")
+		logger.debug(f"{after=}")
+		embed = discord.Embed(
+			title = "User updated",
+			colour = after.colour.value,
+		).set_author(
+			name = f"{after.display_name} ({after})",
+			icon_url = after.display_avatar.url,
+		).set_footer(
+			text = f"User ID: {after.id}",
+		)
+
+		if before.display_avatar.url != after.display_avatar.url:
+			logger.info("display_avatar.url not equal")
+			logger.debug(f"{before.display_avatar.url=}")
+			logger.debug(f"{after.display_avatar.url=}")
+			embed.description = f"{after.mention} changed their avatar"
+			embed = embed.add_field(
+				name = "Before",
+				value = before.display_avatar.url,
+			).add_field(
+				name = "After",
+				value = after.display_avatar.url,
+			)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logger.info("on_user_update sent to channel\n")
+			return
+
+		if before.name != after.name or before.discriminator != after.discriminator:
+			logger.info("name or discriminator not equal")
+			logger.debug(f"{before.name=}")
+			logger.debug(f"{after.name=}")
+			logger.debug(f"{before.discriminator=}")
+			logger.debug(f"{after.discriminator=}")
+			embed.description = f"{after.mention} changed their handle"
+			embed = embed.add_field(
+				name = "Before",
+				value = before,
+			).add_field(
+				name = "After",
+				value = after,
+			)
+			msg =  await self.channel.send(embed = embed)
+			if msg:
+				logger.info("on_user_update sent to channel\n")
+			return
 
 	# ROLES =====================================================================
 
@@ -940,28 +996,28 @@ class Audit(Cog):
 				)
 
 		if embed.description == "The following changes were made:\n":
-			# logger.debug(f"{hash(before)=}")
-			# logger.debug(f"{hash(after)=}")
-			# attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
-			# for attr in attrs:
-			# 	logger.debug(f"Comparing {attr} in before/after")
-			# 	value_before = getattr(before, attr)
-			# 	value_after = getattr(after, attr)
-			# 	logger.debug(f"{value_before=}")
-			# 	logger.debug(f"{value_after=}")
-			# 	if value_before != value_after:
-			# 		logger.warning(f"{attr} not equal")
-			# 	subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
-			# 	for subattr in subattrs:
-			# 		logger.debug(f"Comparing {attr}.{subattr} in before/after")
-			# 		value_before = getattr(before, attr)
-			# 		value_before = getattr(value_before, subattr)
-			# 		value_after = getattr(after, attr)
-			# 		value_after = getattr(value_after, subattr)
-			# 		logger.debug(f"{value_before=}")
-			# 		logger.debug(f"{value_after=}")
-			# 		if value_before != value_after:
-			# 			logger.warning(f"{attr}.{subattr} not equal")
+			logger.debug(f"{hash(before)=}")
+			logger.debug(f"{hash(after)=}")
+			attrs = [f for f in dir(after) if not f.startswith('_') and not callable(getattr(after,f))]
+			for attr in attrs:
+				logger.debug(f"Comparing {attr} in before/after")
+				value_before = getattr(before, attr)
+				value_after = getattr(after, attr)
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
+				if value_before != value_after:
+					logger.warning(f"{attr} not equal")
+				subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
+				for subattr in subattrs:
+					logger.debug(f"Comparing {attr}.{subattr} in before/after")
+					value_before = getattr(before, attr)
+					value_before = getattr(value_before, subattr)
+					value_after = getattr(after, attr)
+					value_after = getattr(value_after, subattr)
+					logger.debug(f"{value_before=}")
+					logger.debug(f"{value_after=}")
+					if value_before != value_after:
+						logger.warning(f"{attr}.{subattr} not equal")
 			logger.warning("Event not handled\n")
 			return
 
