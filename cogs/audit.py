@@ -196,7 +196,7 @@ class Audit(Cog):
 				logger.debug(f"{value_after=}")
 				if value_before != value_after:
 					logger.warning(f"{attr}.{subattr} not equal")
-		logger.warning("Event not handled\n")
+		logger.warning("on_message_edit not handled\n")
 
 	# @Cog.listener()
 	# async def on_raw_message_edit(self, payload):
@@ -819,7 +819,7 @@ class Audit(Cog):
 		# 		logger.debug(f"{value_after=}")
 		# 		if value_before != value_after:
 		# 			logger.warning(f"{attr}.{subattr} not equal")
-		logger.warning("Event not handled\n")
+		logger.warning("on_member_update not handled\n")
 
 	@Cog.listener()
 	async def on_user_update(self, before, after):
@@ -1018,7 +1018,7 @@ class Audit(Cog):
 					logger.debug(f"{value_after=}")
 					if value_before != value_after:
 						logger.warning(f"{attr}.{subattr} not equal")
-			logger.warning("Event not handled\n")
+			logger.warning("on_guild_role_update not handled\n")
 			return
 
 		msg = await self.channel.send(embed = embed)

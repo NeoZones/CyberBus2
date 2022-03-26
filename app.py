@@ -9,6 +9,7 @@ intents.integrations = True
 intents.message_content = True
 intents.messages = True
 intents.members = True
+intents.presences = True
 intents.reactions = True
 intents.voice_states = True
 
