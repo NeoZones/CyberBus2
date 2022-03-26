@@ -184,10 +184,10 @@ class Audit(Cog):
 			logger.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
 			value_after = getattr(after, attr)
+			logger.debug(f"{value_before=}")
+			logger.debug(f"{value_after=}")
 			if value_before != value_after:
 				logger.warning(f"{attr} not equal")
-				logger.debug(f"{value_before=}")
-				logger.debug(f"{value_after=}")
 			subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
 			for subattr in subattrs:
 				logger.debug(f"Comparing {attr}.{subattr} in before/after")
@@ -195,10 +195,10 @@ class Audit(Cog):
 				value_before = getattr(value_before, subattr)
 				value_after = getattr(after, attr)
 				value_after = getattr(value_after, subattr)
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
 				if value_before != value_after:
 					logger.warning(f"{attr}.{subattr} not equal")
-					logger.debug(f"{value_before=}")
-					logger.debug(f"{value_after=}")
 		logger.warning("Event not handled\n")
 
 	# @Cog.listener()
@@ -804,10 +804,10 @@ class Audit(Cog):
 			logger.debug(f"Comparing {attr} in before/after")
 			value_before = getattr(before, attr)
 			value_after = getattr(after, attr)
+			logger.debug(f"{value_before=}")
+			logger.debug(f"{value_after=}")
 			if value_before != value_after:
 				logger.warning(f"{attr} not equal")
-				logger.debug(f"{value_before=}")
-				logger.debug(f"{value_after=}")
 			subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
 			for subattr in subattrs:
 				logger.debug(f"Comparing {attr}.{subattr} in before/after")
@@ -815,10 +815,10 @@ class Audit(Cog):
 				value_before = getattr(value_before, subattr)
 				value_after = getattr(after, attr)
 				value_after = getattr(value_after, subattr)
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
 				if value_before != value_after:
 					logger.warning(f"{attr}.{subattr} not equal")
-					logger.debug(f"{value_before=}")
-					logger.debug(f"{value_after=}")
 		logger.warning("Event not handled\n")
 
 	# ROLES =====================================================================
@@ -950,10 +950,10 @@ class Audit(Cog):
 				logger.debug(f"Comparing {attr} in before/after")
 				value_before = getattr(before, attr)
 				value_after = getattr(after, attr)
+				logger.debug(f"{value_before=}")
+				logger.debug(f"{value_after=}")
 				if value_before != value_after:
 					logger.warning(f"{attr} not equal")
-					logger.debug(f"{value_before=}")
-					logger.debug(f"{value_after=}")
 				subattrs = [f for f in dir(getattr(before, attr)) if not f.startswith('_') and not callable(getattr(getattr(before, attr),f))]
 				for subattr in subattrs:
 					logger.debug(f"Comparing {attr}.{subattr} in before/after")
@@ -961,10 +961,10 @@ class Audit(Cog):
 					value_before = getattr(value_before, subattr)
 					value_after = getattr(after, attr)
 					value_after = getattr(value_after, subattr)
+					logger.debug(f"{value_before=}")
+					logger.debug(f"{value_after=}")
 					if value_before != value_after:
 						logger.warning(f"{attr}.{subattr} not equal")
-						logger.debug(f"{value_before=}")
-						logger.debug(f"{value_after=}")
 			logger.warning("Event not handled\n")
 			return
 
