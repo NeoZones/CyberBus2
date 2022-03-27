@@ -282,7 +282,7 @@ class Music(Cog):
 			return None
 		filename = f"sounds/normalized/{query}"
 		try:
-			player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
+			player = discord.FFmpegPCMAudio(filename)
 		except:
 			return None
 		if player.read():
