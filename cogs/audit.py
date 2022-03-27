@@ -189,9 +189,11 @@ class Audit(Cog):
 			for subattr in subattrs:
 				logger.debug(f"Comparing {attr}.{subattr} in before/after")
 				value_before = getattr(before, attr)
-				value_before = getattr(value_before, subattr)
+				if value_before:
+					value_before = getattr(value_before, subattr)
 				value_after = getattr(after, attr)
-				value_after = getattr(value_after, subattr)
+				if value_after:
+					value_after = getattr(value_after, subattr)
 				logger.debug(f"{value_before=}")
 				logger.debug(f"{value_after=}")
 				if value_before != value_after:
@@ -812,9 +814,11 @@ class Audit(Cog):
 		# 	for subattr in subattrs:
 		# 		logger.debug(f"Comparing {attr}.{subattr} in before/after")
 		# 		value_before = getattr(before, attr)
-		# 		value_before = getattr(value_before, subattr)
+		# 		if value_before:
+		# 			value_before = getattr(value_before, subattr)
 		# 		value_after = getattr(after, attr)
-		# 		value_after = getattr(value_after, subattr)
+		# 		if value_after:
+		# 			value_after = getattr(value_after, subattr)
 		# 		logger.debug(f"{value_before=}")
 		# 		logger.debug(f"{value_after=}")
 		# 		if value_before != value_after:
@@ -1011,9 +1015,11 @@ class Audit(Cog):
 				for subattr in subattrs:
 					logger.debug(f"Comparing {attr}.{subattr} in before/after")
 					value_before = getattr(before, attr)
-					value_before = getattr(value_before, subattr)
+					if value_before:
+						value_before = getattr(value_before, subattr)
 					value_after = getattr(after, attr)
-					value_after = getattr(value_after, subattr)
+					if value_after:
+						value_after = getattr(value_after, subattr)
 					logger.debug(f"{value_before=}")
 					logger.debug(f"{value_after=}")
 					if value_before != value_after:
