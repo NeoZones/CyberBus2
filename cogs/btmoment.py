@@ -24,13 +24,13 @@ class BTMoment(Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.channel = self.bot.get_channel(VCJoin.CHANNEL)
+		self.channel = self.bot.get_channel(BTMoment.CHANNEL)
 		print("Initialized BTMoment cog")
 
 	@Cog.listener()
 	async def on_ready(self):
 		await self.bot.wait_until_ready()
-		self.channel = self.bot.get_channel(VCJoin.CHANNEL)
+		self.channel = self.bot.get_channel(BTMoment.CHANNEL)
 
 	@Cog.listener()
 	async def on_voice_state_update(self, member, before, after):
