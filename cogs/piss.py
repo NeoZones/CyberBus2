@@ -1,5 +1,6 @@
 import discord
 from discord.ext.commands import Cog
+import re
 
 def setup(bot):
 	bot.add_cog(Piss(bot))
