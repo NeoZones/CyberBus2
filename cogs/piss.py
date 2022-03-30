@@ -14,7 +14,19 @@ class Piss(Cog):
 	async def on_message(self, message):
 		if message.author.id == self.bot.user.id:
 			return
-		if "piss" in message.content.lower():
+		piss = re.compile(
+			r'''
+			\bpiss\b
+			''',
+			re.VERBOSE | re.IGNORECASE
+			)
+		kink = re.compile(
+			r'''
+			\bkinks?\b
+			''',
+			re.VERBOSE | re.IGNORECASE
+			)
+		if piss.findall(message.content):
 			await message.reply("I have kinks!", mention_author=False)
-		elif "kink" in message.content.lower():
+		elif kink.findall(message.content):
 			await message.reply("I have kinks! PISS", mention_author=False)
