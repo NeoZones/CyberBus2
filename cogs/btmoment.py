@@ -42,8 +42,8 @@ class BTMoment(Cog):
 		logger.debug("owly joined vc")
 
 		history = await self.channel.history(limit=2).flatten()
-		m2 = history[0] # second-to-last message
-		m1 = history[1] # last message
+		m2 = history[1] # second-to-last message
+		m1 = history[0] # last message
 
 		logger.debug(f"{m2.embeds[0].description=}")
 		logger.debug(f"{m1.embeds[0].description=}")
