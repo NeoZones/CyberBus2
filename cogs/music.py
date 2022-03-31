@@ -518,6 +518,7 @@ class Music(Cog):
 				msg = await ctx.send(f"Added **{len(tracks)}** track(s) to queue.")
 				if msg:
 					Music.logger.info(f"Message sent: Added **{len(tracks)}** track(s) to queue.")
+				return
 		# If not playing, start playing
 		if len(self.q) == 1:
 			msg = await ctx.send(f"Playing **{self.q[0].title}**")
