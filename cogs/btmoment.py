@@ -39,11 +39,15 @@ class BTMoment(Cog):
 		if not after.channel: # ignore leaving -- only check for join or move
 			return
 		
+		logger.debug("owly joined vc")
+
 		history = await self.channel.history(limit=2).flatten()
 		m2 = history[0] # second-to-last message
 		m1 = history[1] # last message
-		logger.debug(f"{m2=}")
-		logger.debug(f"{m1=}")
+		logger.debug(f"{m2.author=}")
+		logger.debug(f"{m2.embeds=}")
+		logger.debug(f"{m1.author=}")
+		logger.debug(f"{m1.embeds=}")
 
 		bt_moment = False
 
