@@ -46,8 +46,12 @@ class BTMoment(Cog):
 		m1 = history[1] # last message
 		logger.debug(f"{m2.author=}")
 		logger.debug(f"{m2.embeds=}")
+		logger.debug(f"{m2.embeds[0].title=}")
+		logger.debug(f"{m2.embeds[0].author=}")
 		logger.debug(f"{m1.author=}")
 		logger.debug(f"{m1.embeds=}")
+		logger.debug(f"{m1.embeds[0].title=}")
+		logger.debug(f"{m1.embeds[0].author=}")
 
 		bt_moment = False
 
