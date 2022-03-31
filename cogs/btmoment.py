@@ -48,6 +48,9 @@ class BTMoment(Cog):
 		logger.debug(f"{m2.embeds[0].description=}")
 		logger.debug(f"{m1.embeds[0].description=}")
 
+		logger.debug(f"{m1.created_at=}")
+		logger.debug(f"{datetime.now()=}")
+
 		bt_moment = False
 
 		if ( # last 2 messages from ricky had embeds where owly left then joined
