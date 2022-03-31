@@ -45,6 +45,9 @@ class BTMoment(Cog):
 		m2 = history[0] # second-to-last message
 		m1 = history[1] # last message
 
+		logger.debug(f"{m2.embeds[0].description=}")
+		logger.debug(f"{m1.embeds[0].description=}")
+
 		bt_moment = False
 
 		if ( # last 2 messages from ricky had embeds where owly left then joined
