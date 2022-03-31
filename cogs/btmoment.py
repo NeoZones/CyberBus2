@@ -44,14 +44,6 @@ class BTMoment(Cog):
 		history = await self.channel.history(limit=2).flatten()
 		m2 = history[0] # second-to-last message
 		m1 = history[1] # last message
-		logger.debug(f"{m2.author=}")
-		logger.debug(f"{m2.embeds=}")
-		logger.debug(f"{m2.embeds[0].title=}")
-		logger.debug(f"{m2.embeds[0].author=}")
-		logger.debug(f"{m1.author=}")
-		logger.debug(f"{m1.embeds=}")
-		logger.debug(f"{m1.embeds[0].title=}")
-		logger.debug(f"{m1.embeds[0].author=}")
 
 		bt_moment = False
 
@@ -60,8 +52,8 @@ class BTMoment(Cog):
 			and m2.author.id == self.bot.user.id
 			and m2.embeds
 			and m1.embeds
-			and "left" in m2.embeds[0].title
-			and "joined" in m1.embeds[0].title
+			and "left" in m2.embeds[0].description
+			and "joined" in m1.embeds[0].description
 			and "Owly#6604" in m2.embeds[0].author.name
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (m2.created_at - m1.created_at).total_seconds() < 120
@@ -71,7 +63,7 @@ class BTMoment(Cog):
 		elif ( # last message from ricky had embed where owly left
 			m1.author.id == self.bot.user.id
 			and m1.embeds
-			and "left" in m1.embeds[0].title
+			and "left" in m1.embeds[0].description
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (datetime.now() - m1.created_at).total_seconds() < 120
 		):
