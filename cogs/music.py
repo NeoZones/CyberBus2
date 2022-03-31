@@ -402,7 +402,9 @@ class Music(Cog):
 	async def play_next(self, ctx):
 		Music.logger.debug("play_next() called")
 		if not ctx.voice_client:
-			Music.logger.warning("no voice client, cannot play_next()")
+			return
+
+		if ctx.voice_client.is_playing():
 			return
 
 		if self.repeat_mode == Music.REPEAT_NONE:
