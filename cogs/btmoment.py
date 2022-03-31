@@ -4,22 +4,22 @@ from os import path, makedirs
 import logging
 from datetime import datetime
 
+if not path.exists('.logs'):
+	makedirs('.logs')
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('.logs/btmoment.log')
+formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
+fh.setFormatter(formatter)
+if not len(logger.handlers):
+	logger.addHandler(fh)
+
 def setup(bot):
-	
 	bot.add_cog(BTMoment(bot))
 
 class BTMoment(Cog):
 	"""Log when a member joins VC, for pinging purposes"""
-
-	if not path.exists('.logs'):
-		makedirs('.logs')
-
-	logger = logging.getLogger(__name__)
-	logger.setLevel(logging.DEBUG)
-	fh = logging.FileHandler('.logs/btmoment.log')
-	formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
-	fh.setFormatter(formatter)
-	logger.addHandler(fh)
 
 	CHANNEL = 620028244887994408
 
@@ -40,7 +40,7 @@ class BTMoment(Cog):
 		if not after.channel: # ignore leaving -- only check for join or move
 			return
 		
-		BTMoment.logger.debug("owly joined vc")
+		logger.debug("owly joined vc")
 
 		history = await self.channel.history(limit=2).flatten()
 		m2 = history[1] # second-to-last message
@@ -59,7 +59,7 @@ class BTMoment(Cog):
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (m2.created_at - m1.created_at).total_seconds() < 120
 		):
-			BTMoment.logger.info("BTMoment event was received after VCJoin event")
+			logger.info("BTMoment event was received after VCJoin event")
 			bt_moment = True
 		elif ( # last message from ricky had embed where owly left
 			m1.author.id == self.bot.user.id
@@ -68,7 +68,7 @@ class BTMoment(Cog):
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() < 120
 		):
-			BTMoment.logger.info("BTMoment event was received before VCJoin event")
+			logger.info("BTMoment event was received before VCJoin event")
 			bt_moment = True
 
 		if not bt_moment:
@@ -76,5 +76,5 @@ class BTMoment(Cog):
 
 		msg = await self.channel.send("bt moment")
 		if msg:
-			BTMoment.logger.info("Message sent: bt moment")
+			logger.info("Message sent: bt moment")
 
