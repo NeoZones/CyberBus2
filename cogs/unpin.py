@@ -6,6 +6,11 @@ import asyncio
 import logging
 
 def setup(bot):
+	bot.add_cog(Unpin(bot))
+
+class Unpin(Cog):
+	"""Reply to unpinned messages in the channel they were posted"""
+
 	if not path.exists('.logs'):
 		makedirs('.logs')
 
@@ -15,11 +20,6 @@ def setup(bot):
 	formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
 	fh.setFormatter(formatter)
 	logger.addHandler(fh)
-	
-	bot.add_cog(Unpin(bot))
-
-class Unpin(Cog):
-	"""Reply to unpinned messages in the channel they were posted"""
 
 	def __init__(self, bot):
 		self.bot = bot
@@ -31,15 +31,15 @@ class Unpin(Cog):
 		self.guild = await self.bot.fetch_guild(int(getenv("GUILD_ID")))
 		# load cache from pickle if it exists
 		if not path.exists('.cache/messages'):
-			logger.info("creating .cache/messages folder")
+			Unpin.logger.info("creating .cache/messages folder")
 			makedirs('.cache/messages')
 		filename = '.cache/messages/pins.pickle'
 		self.cache = set()
 		if path.getsize(filename) > 0:
 			with open(filename, 'r+b') as f:
 				self.cache = pickle.load(f)
-				logger.info("loaded pins.pickle file")
-				logger.debug(f"{self.cache=}")
+				Unpin.logger.info("loaded pins.pickle file")
+				Unpin.logger.debug(f"{self.cache=}")
 		else:
 			# get pinned message IDs
 			channels = await self.guild.fetch_channels()
@@ -52,7 +52,7 @@ class Unpin(Cog):
 				for message in pins:
 					if message.id not in self.cache:
 						self.cache.add(message.id)
-						logger.debug(f"{message.id} added to pin cache")
+						Unpin.logger.debug(f"{message.id} added to pin cache")
 			# commit cacheset to file storage
 			with open(filename, 'w+b') as f:
 				pickle.dump(self.cache, f)
@@ -66,18 +66,18 @@ class Unpin(Cog):
 		url = f"https://discord.com/channels/{guild_id}/{channel_id}/{message_id}"
 
 		if "pinned" not in payload.data:
-			logger.info("ignoring partial update with no payload.data.pinned")
+			Unpin.logger.info("ignoring partial update with no payload.data.pinned")
 			return
 		
-		logger.debug(f"{self.cache=}")
+		Unpin.logger.debug(f"{self.cache=}")
 		pinned_after = payload.data['pinned']
 		pinned_before = message_id in self.cache
 		if pinned_after and not pinned_before: # Pinned already generates a native message, so ignore pins
 			self.cache.add(message_id) # but we should still cache this pin
-			logger.debug(f"{message_id} added to pin cache")
+			Unpin.logger.debug(f"{message_id} added to pin cache")
 			return
 		if pinned_before and not pinned_after: # Generate a notice for unpinned messages
-			logger.info(f"unpin detected for message {url}")
+			Unpin.logger.info(f"unpin detected for message {url}")
 			channel = self.bot.get_channel(channel_id)
 			message = payload.cached_message or await channel.fetch_message(message_id)
 			msg = await channel.send(
@@ -89,4 +89,4 @@ class Unpin(Cog):
 				mention_author = False
 			)
 			if msg:
-				logger.info(f"Message unpinned: {url}")
+				Unpin.logger.info(f"Message unpinned: {url}")

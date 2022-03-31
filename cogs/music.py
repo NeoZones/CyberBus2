@@ -11,16 +11,6 @@ from functools import partial
 import logging
 
 def setup(bot):
-	if not path.exists('.logs'):
-		makedirs('.logs')
-
-	logger = logging.getLogger(__name__)
-	logger.setLevel(logging.DEBUG)
-	fh = logging.FileHandler('.logs/music.log')
-	formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
-	fh.setFormatter(formatter)
-	logger.addHandler(fh)
-
 	bot.add_cog(Music(bot))
 
 def format_time(d):
@@ -48,21 +38,21 @@ class Player(discord.PCMVolumeTransformer):
 		self.source = source
 		self.duration = duration
 		self.data = data
-		logger.info(f"Player created for {source}")
+		Music.logger.info(f"Player created for {source}")
 	
 	@classmethod
 	async def prepare_file(cls, track, *, loop):
 		loop = loop or asyncio.get_event_loop()
-		logger.info(f"Preparing player from file: {track.source}")
+		Music.logger.info(f"Preparing player from file: {track.source}")
 		return cls(track.source, track.duration, data = track.data, ffmpeg_options = {"options": "-vn"})
 
 	@classmethod
 	async def prepare_stream(cls, track, *, loop):
 		loop = loop or asyncio.get_event_loop()
-		logger.info(f"Preparing player from stream: {track.source}")
+		Music.logger.info(f"Preparing player from stream: {track.source}")
 		to_run = partial(ytdl.extract_info, url = track.source, download = False)
 		data = await loop.run_in_executor(None, to_run)
-		logger.info(f"Stream URL: {data['url']}")
+		Music.logger.info(f"Stream URL: {data['url']}")
 		return cls(data['url'], track.duration, data = data, ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"})
 
 
@@ -126,6 +116,16 @@ class Track:
 class Music(Cog):
 	"""Play audio within a voice channel."""
 	
+	if not path.exists('.logs'):
+		makedirs('.logs')
+
+	logger = logging.getLogger(__name__)
+	logger.setLevel(logging.DEBUG)
+	fh = logging.FileHandler('.logs/music.log')
+	formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
+	fh.setFormatter(formatter)
+	logger.addHandler(fh)
+
 	REPEAT_NONE = 0
 	REPEAT_ONE = 1
 	REPEAT_ALL = 2
@@ -145,7 +145,7 @@ class Music(Cog):
 	@command(aliases=['start', 'summon', 'connect'])
 	async def join(self, ctx, *, channel: discord.VoiceChannel = None):
 		"""Joins a voice channel"""
-		logger.info(f".join {channel}" if channel else ".join")
+		Music.logger.info(f".join {channel}" if channel else ".join")
 		if not channel: # Upon a raw "join" command without a channel specified,
 			if not ctx.author.voice:
 				msg =  await ctx.send(
@@ -153,24 +153,24 @@ class Music(Cog):
 					"or specify a voice channel in order to use this command"
 					)
 				if msg:
-					logger.info(f"Message sent: no channel specified, and {ctx.author} is not in a voice channel")
+					Music.logger.info(f"Message sent: no channel specified, and {ctx.author} is not in a voice channel")
 				return
 			channel = ctx.author.voice.channel # bind to your current vc channel.
 		if ctx.voice_client: # If the bot is in a different channel,
 			await ctx.voice_client.move_to(channel) # move to your channel.
-			logger.info(f"existing voice client moved to {channel}")
+			Music.logger.info(f"existing voice client moved to {channel}")
 			return
 		voice_client = await channel.connect() # Finally, join the chosen channel.
 		if voice_client:
-			logger.info("voice client created")
+			Music.logger.info("voice client created")
 	
 	@command(aliases=['quit', 'dismiss', 'disconnect'])
 	async def leave(self, ctx):
 		"""Stop+disconnect from voice"""
-		logger.info(".leave")
+		Music.logger.info(".leave")
 		if ctx.voice_client:
 			await ctx.voice_client.disconnect()
-			logger.info("voice client disconnected")
+			Music.logger.info("voice client disconnected")
 	
 	def get_duration_from_file(self, filename):
 		cmd = subprocess.run(
@@ -184,7 +184,7 @@ class Music(Cog):
 		return float(cmd.stdout)
 	
 	async def get_tracks_from_query(self, ctx, query):
-		logger.debug(f"get_tracks_from_query() called for query: {query}")
+		Music.logger.debug(f"get_tracks_from_query() called for query: {query}")
 		# Detect if the track should be downloaded
 		download = False
 		if query.endswith('!dl'):
@@ -195,19 +195,19 @@ class Music(Cog):
 			query = query[:-9]
 		# Handle attachment playback
 		if query == "file":
-			logger.info(f"getting tracks from attachment")
+			Music.logger.info(f"getting tracks from attachment")
 			return await self.get_tracks_from_attachments(ctx)
 		# Handle online playback
 		elif query.startswith('http'):
-			logger.info(f"getting tracks from url")
+			Music.logger.info(f"getting tracks from url")
 			return await self.get_tracks_from_url(ctx, query, download=download)
 		# Handle local playback
 		elif tracks := await self.get_tracks_from_path(ctx, query):
-			logger.info(f"getting tracks from path to local file")
+			Music.logger.info(f"getting tracks from path to local file")
 			return tracks
 		# Do a youtube search if not found and no prior search
 		elif not self.search_results:
-			logger.info(f"performing a search result")
+			Music.logger.info(f"performing a search result")
 			return await self.search_youtube(ctx, query=query)
 		# Handle prior search
 		try:
@@ -218,22 +218,22 @@ class Music(Cog):
 			return ctx.send(f"Please provide an integer between 1 and {self.MAX_RESULTS}")
 		url = f"https://youtube.com{self.search_results[i]['url_suffix']}"
 		self.search_results = []
-		logger.info(f"handling a prior search")
+		Music.logger.info(f"handling a prior search")
 		return await self.get_tracks_from_url(ctx, url)
 	
 	async def get_tracks_from_url(self, ctx, url, download=False):
-		logger.debug(f"get_tracks_from_url() called for URL: {url}")
+		Music.logger.debug(f"get_tracks_from_url() called for URL: {url}")
 		try:
 			data = ytdl.extract_info(url, download=download)
-			logger.debug(f"{data=}")
+			Music.logger.debug(f"{data=}")
 			# Detect tabs
 			if data['extractor'] == 'youtube:tab' and not "entries" in data:
-				logger.info("youtube:tab detected, no entries in data (so not a playlist)")
+				Music.logger.info("youtube:tab detected, no entries in data (so not a playlist)")
 				data = ytdl.extract_info(data['url'], download=download) # process the playlist url
-				logger.debug(f"{data=}")
+				Music.logger.debug(f"{data=}")
 		except Exception as e:
-			logger.error("Exception thrown!")
-			logger.error(f"{e=}")
+			Music.logger.error("Exception thrown!")
+			Music.logger.error(f"{e=}")
 			return e
 		# Detect playlists
 		entries = [data] # Assume that there is only one song.
@@ -247,11 +247,11 @@ class Music(Cog):
 			duration = None
 			data = entry
 			if not "duration" in entry and not "duration_string" in data:
-				logger.info("duration not found in entry's extracted data -- refetching")
-				logger.debug(f"{data=}")
+				Music.logger.info("duration not found in entry's extracted data -- refetching")
+				Music.logger.debug(f"{data=}")
 				start = time()
 				data = ytdl.extract_info(url, download=download)
-				logger.info(f"Refetching data took {time() - start} seconds")
+				Music.logger.info(f"Refetching data took {time() - start} seconds")
 			if "duration" in entry:
 				duration = data["duration"]
 			elif "duration_string" in entry:
@@ -271,13 +271,13 @@ class Music(Cog):
 					data=data
 				)
 			)
-		logger.info(f"Got {len(tracks)} track(s) from URL")
-		logger.debug(f"{tracks=}")
+		Music.logger.info(f"Got {len(tracks)} track(s) from URL")
+		Music.logger.debug(f"{tracks=}")
 		return tracks
 	
 	async def get_tracks_from_path(self, ctx, query):
 		"""Attempt to load a local file from path"""
-		logger.debug(f"get_tracks_from_path() called for query: {query}")
+		Music.logger.debug(f"get_tracks_from_path() called for query: {query}")
 		if "/.." in query:
 			return None
 		filename = f"sounds/normalized/{query}"
@@ -286,7 +286,7 @@ class Music(Cog):
 		except:
 			return None
 		if player.read():
-			logger.info("filename is readable from path")
+			Music.logger.info("filename is readable from path")
 			return [
 				Track(
 					source=filename,
@@ -299,7 +299,7 @@ class Music(Cog):
 	
 	async def get_tracks_from_attachments(self, ctx):
 		"""Fetch the attachment URL and convert it to a track"""
-		logger.debug(f"get_tracks_from_attachment() called")
+		Music.logger.debug(f"get_tracks_from_attachment() called")
 		attachments = ctx.message.attachments
 		tracks = []
 		for attachment in attachments:
@@ -307,45 +307,45 @@ class Music(Cog):
 				track = await self.get_tracks_from_url(ctx, attachment.url, download=False)
 				tracks += track
 			except Exception as e:
-				logger.error("Exception thrown!")
-				logger.error(f"{e=}")
+				Music.logger.error("Exception thrown!")
+				Music.logger.error(f"{e=}")
 				msg = await ctx.send(
 				f"An error occurred while adding `{attachment.filename}`:\n"
 				f"```{e.exc_info[1]}```"
 				)
 				if msg:
-					logger.warning("Message sent: An error occurred while adding `{attachment.filename}`")
+					Music.logger.warning("Message sent: An error occurred while adding `{attachment.filename}`")
 				return e
-		logger.debug(f"{tracks=}")
+		Music.logger.debug(f"{tracks=}")
 		return tracks
 
 	@command(name='search')
 	async def search_youtube(self, ctx, *, query):
 		"""Do a YouTube search for the given query"""
-		logger.debug(f"search_youtube() called for query: {query}")
+		Music.logger.debug(f"search_youtube() called for query: {query}")
 		try:
 			self.search_results = ytdl.extract_info(f"ytsearch{self.MAX_RESULTS}:{query}", download=False)
 		except Exception as e:
-			logger.error("Exception thrown!")
-			logger.error(f"{e=}")
+			Music.logger.error("Exception thrown!")
+			Music.logger.error(f"{e=}")
 			msg = await ctx.send(
 			f"An error occurred while searching for `{query}`:\n"
 			f"```{e.exc_info[1]}```"
 			)
 			if msg:
-				logger.warning(f"Message sent: An error occurred while searching for `{query}`")
+				Music.logger.warning(f"Message sent: An error occurred while searching for `{query}`")
 			return e
 		await self.results(ctx)
 	
 	@command()
 	async def results(self, ctx):
 		"""Show results of a prior search"""
-		logger.debug(f"results() called")
+		Music.logger.debug(f"results() called")
 		if not self.search_results:
-			logger.info("No stored search results")
+			Music.logger.info("No stored search results")
 			msg = await ctx.send("There are no stored search results right now.")
 			if msg:
-				logger.warning("Message sent: There are no stored search results right now.")
+				Music.logger.warning("Message sent: There are no stored search results right now.")
 			return
 
 		embeds = []
@@ -397,12 +397,12 @@ class Music(Cog):
 
 		msg = await ctx.send(formatted_results, embeds = embeds)
 		if msg:
-			logger.info("Message sent: formatted_results")
+			Music.logger.info("Message sent: formatted_results")
 
 	async def play_next(self, ctx):
-		logger.debug("play_next() called")
+		Music.logger.debug("play_next() called")
 		if not ctx.voice_client:
-			logger.warning("no voice client, cannot play_next()")
+			Music.logger.warning("no voice client, cannot play_next()")
 			return
 
 		if self.repeat_mode == Music.REPEAT_NONE:
@@ -420,26 +420,26 @@ class Music(Cog):
 		else:
 			player = await Player.prepare_file(self.track, loop = self.bot.loop)
 		
-		logger.info("playing Player on the voice client")
+		Music.logger.info("playing Player on the voice client")
 		ctx.voice_client.play(
 			player,
 			after=lambda e: self.after(ctx)
 		)
 	
 	def after(self, ctx):
-		logger.debug("after() called")
+		Music.logger.debug("after() called")
 		if not self.q and self.repeat_mode == Music.REPEAT_NONE:
-			logger.info("queue empty and not repeating")
+			Music.logger.info("queue empty and not repeating")
 			self.track = None
 			asyncio.run_coroutine_threadsafe(
 				ctx.send(f"Finished playing queue."),
 				self.bot.loop
 			).result()
-			logger.info("Finished playing queue.")
+			Music.logger.info("Finished playing queue.")
 		if self.q and not ctx.voice_client.is_playing():
-			logger.info("queue exists and voice client is not playing")
-			logger.debug(f"{self.q=}")
-			logger.info("playing next...")
+			Music.logger.info("queue exists and voice client is not playing")
+			Music.logger.debug(f"{self.q=}")
+			Music.logger.info("playing next...")
 			asyncio.run_coroutine_threadsafe(
 				self.play_next(ctx),
 				self.bot.loop
@@ -447,7 +447,7 @@ class Music(Cog):
 
 	def check_for_numbers(self, ctx):
 		"""anti numbers action"""
-		logger.debug("check_for_numbers() called")
+		Music.logger.debug("check_for_numbers() called")
 		NUMBERS = 187024083471302656
 		RICKY = 949503750651936828
 		if ctx.author.id != NUMBERS:
@@ -464,20 +464,20 @@ class Music(Cog):
 		query: str,
 		top: bool = False
 	):
-		logger.debug("add_to_queue() called")
+		Music.logger.debug("add_to_queue() called")
 		# Check for permission to add tracks
 		allowed = self.check_for_numbers(ctx)
 		if not allowed:
-			logger.info(f"{ctx.author} is not allowed to add to queue")
+			Music.logger.info(f"{ctx.author} is not allowed to add to queue")
 			return await ctx.send(
 			"You must be in a voice chat by yourself "
 			"in order to use this command."
 			)
 		# Ensure we are connected to voice
 		if not ctx.voice_client:
-			logger.warning("no voice client")
+			Music.logger.warning("no voice client")
 			if ctx.author.voice:
-				logger.info(f"moving voice client to {ctx.author.voice.channel}")
+				Music.logger.info(f"moving voice client to {ctx.author.voice.channel}")
 				await ctx.author.voice.channel.connect()
 			else:
 				msg = await ctx.send(
@@ -487,7 +487,7 @@ class Music(Cog):
 				"play any tracks."
 				)
 				if msg:
-					logger.info("Message sent: author not in voice, and no voice client exists")
+					Music.logger.info("Message sent: author not in voice, and no voice client exists")
 				return
 		# Guard against errors
 		tracks = await self.get_tracks_from_query(ctx, query)
@@ -497,7 +497,7 @@ class Music(Cog):
 			f"```{tracks}```"
 			)
 			if msg:
-				logger.warning(f"Message sent: An error occurred while trying to add `{query}` to the queue")
+				Music.logger.warning(f"Message sent: An error occurred while trying to add `{query}` to the queue")
 			return
 		if not tracks: # a search was performed instead
 			return
@@ -510,33 +510,33 @@ class Music(Cog):
 			if top:
 				msg = await ctx.send(f"Added **{len(tracks)}** track(s) to top of queue.")
 				if msg:
-					logger.info(f"Message sent: Added **{len(tracks)}** track(s) to top of queue.")
+					Music.logger.info(f"Message sent: Added **{len(tracks)}** track(s) to top of queue.")
 				return
 			else:
 				msg = await ctx.send(f"Added **{len(tracks)}** track(s) to queue.")
 				if msg:
-					logger.info(f"Message sent: Added **{len(tracks)}** track(s) to queue.")
+					Music.logger.info(f"Message sent: Added **{len(tracks)}** track(s) to queue.")
 		# If not playing, start playing
 		if len(self.q) == 1:
 			msg = await ctx.send(f"Playing **{self.q[0].title}**")
 			if msg:
-				logger.info(f"Message sent: Playing **{self.q[0].title}**")
+				Music.logger.info(f"Message sent: Playing **{self.q[0].title}**")
 		else:
 			msg = await ctx.send(f"Playing {len(tracks)} tracks.")
 			if msg:
-				logger.info(f"Message sent: Playing {len(tracks)} tracks.")
+				Music.logger.info(f"Message sent: Playing {len(tracks)} tracks.")
 		await self.play_next(ctx)
 
 	@command(aliases=['p', 'listen'])
 	async def play(self, ctx, *, query):
 		"""Add track(s) to queue"""
-		logger.info(f".play {query}")
+		Music.logger.info(f".play {query}")
 		return await self.add_to_queue(ctx, query, top=False)
 
 	@command(aliases=['ptop', 'top'])
 	async def playtop(self, ctx, *, query):
 		"""Add tracks to top of queue"""
-		logger.info(f".playtop {query}")
+		Music.logger.info(f".playtop {query}")
 		return await self.add_to_queue(ctx, query, top=True)
 	
 	# TODO: repeat once, repeat all, repeat none (repeat/loop command)
@@ -553,10 +553,10 @@ class Music(Cog):
 	@command(aliases=['q'])
 	async def queue(self, ctx, p: int = 1):
 		"""Show tracks up next"""
-		logger.info(f".queue {p}" if p else ".queue")
+		Music.logger.info(f".queue {p}" if p else ".queue")
 		if not self.q and not self.track:
 			msg = await ctx.send("The queue is currently empty.")
-			logger.info("Message sent: The queue is currently empty.")
+			Music.logger.info("Message sent: The queue is currently empty.")
 			return
 		full_q = [self.track] + self.q
 		page = full_q[self.PAGE_SIZE*(p-1):self.PAGE_SIZE*p]
@@ -572,16 +572,16 @@ class Music(Cog):
 				formatted_results += "=== Up next ===\n"
 		msg = await ctx.send(formatted_results)
 		if msg:
-			logger.info("Message sent: Sent queue page to channel")
+			Music.logger.info("Message sent: Sent queue page to channel")
 	
 	@command(aliases=['np'])
 	async def nowplaying(self, ctx):
 		"""Show currently playing track"""
-		logger.info(".nowplaying")
+		Music.logger.info(".nowplaying")
 		if not self.track:
 			msg = await ctx.send("Nothing is currently playing")
 			if msg:
-				logger.info("Nothing is currently playing")
+				Music.logger.info("Nothing is currently playing")
 			return
 		source = ctx.voice_client.source
 		embed = discord.Embed(
@@ -607,64 +607,64 @@ class Music(Cog):
 			embed = embed
 		)
 		if msg:
-			logger.info(f"Message sent: Now playing: {self.track}")
+			Music.logger.info(f"Message sent: Now playing: {self.track}")
 	
 	@command()
 	async def skip(self, ctx):
 		"""Start playing next track"""
-		logger.info(".skip")
+		Music.logger.info(".skip")
 		if ctx.voice_client.is_playing():
 			if self.track:
 				msg = await ctx.send(f"Skipping: {self.track.title}")
 				if msg:
-					logger.info(f"Message sent: Skipping: {self.track.title}")
+					Music.logger.info(f"Message sent: Skipping: {self.track.title}")
 			ctx.voice_client.stop()
 	
 	@command()
 	async def remove(self, ctx, i):
 		"""Remove track at given position"""
-		logger.info(f".remove {i}")
+		Music.logger.info(f".remove {i}")
 		i = int(i) - 1
 		track = self.q.pop(i)
 		msg = await ctx.send(f"Removed: {track.title}")
 		if msg:
-			logger.info(f"Message sent: Removed: {track.title}")
+			Music.logger.info(f"Message sent: Removed: {track.title}")
 	
 	@command()
 	async def pause(self, ctx):
 		"""Pause the currently playing track"""
-		logger.info(".pause")
+		Music.logger.info(".pause")
 		if ctx.voice_client.is_playing():
 			ctx.voice_client.pause()
 			msg = await ctx.send("Playback is paused.")
 			if msg:
-				logger.info("Message sent: Playback is paused.")
+				Music.logger.info("Message sent: Playback is paused.")
 	
 	@command()
 	async def resume(self, ctx):
 		"""Resume playback of a paused track"""
-		logger.info(".resume")
+		Music.logger.info(".resume")
 		if ctx.voice_client.is_paused():
 			ctx.voice_client.resume()
 			msg = await ctx.send("Playback is resumed.")
 			if msg:
-				logger.info("Message sent: Playback is resumed.")
+				Music.logger.info("Message sent: Playback is resumed.")
 	
 	@command()
 	async def shuffle(self, ctx):
 		"""Randomizes the current queue"""
-		logger.info(".shuffle")
+		Music.logger.info(".shuffle")
 		if not self.q:
 			return await ctx.send("There is no queue to shuffle")
 		self.q = random.shuffle(self.q)
 		msg = await ctx.send("Queue has been shuffled")
 		if msg:
-			logger.info("Message sent: Queue has been shuffled")
+			Music.logger.info("Message sent: Queue has been shuffled")
 
 	@command()
 	async def stop(self, ctx):
 		"""Clear queue and stop playing"""
-		logger.info(".stop")
+		Music.logger.info(".stop")
 		self.q = []
 		self.track = None
 		if ctx.voice_client:
@@ -672,21 +672,21 @@ class Music(Cog):
 				ctx.voice_client.stop()
 		msg = await ctx.send("Stopped playing tracks and cleared queue.")
 		if msg:
-			logger.info("Message sent: Stopped playing tracks and cleared queue.")
+			Music.logger.info("Message sent: Stopped playing tracks and cleared queue.")
 
 	@command()
 	async def clear(self, ctx):
 		"""Clear queue, but keep playing"""
-		logger.info(".clear")
+		Music.logger.info(".clear")
 		self.q = []
 		msg = await ctx.send("Queue has been cleared.")
 		if msg:
-			logger.info("Message sent: Queue has been cleared.")
+			Music.logger.info("Message sent: Queue has been cleared.")
 		
 	@command(aliases=['v', 'vol'])
 	async def volume(self, ctx, volume: int):
 		"""Changes the player's volume"""
-		logger.info(f".volume {volume}")
+		Music.logger.info(f".volume {volume}")
 		if ctx.voice_client is None:
 			return await ctx.send("Not connected to a voice channel.")
 		if volume not in range(101):
@@ -697,7 +697,7 @@ class Music(Cog):
 	@command(aliases=['list'])
 	async def catalogue(self, ctx, subdirectory=""):
 		"""Shows the available local files"""
-		logger.info(f".catalogue {subdirectory}" if subdirectory else ".catalogue")
+		Music.logger.info(f".catalogue {subdirectory}" if subdirectory else ".catalogue")
 		if "../" in subdirectory:
 			return await ctx.send(f"Nice try, but that won't work.")
 		path = "."
