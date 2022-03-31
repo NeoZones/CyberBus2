@@ -10,17 +10,17 @@ import math # for ceiling function in queue pages
 from functools import partial
 import logging
 
-if not path.exists('.logs'):
-	makedirs('.logs')
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('.logs/music.log')
-formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
-fh.setFormatter(formatter)
-logger.addHandler(fh)
-
 def setup(bot):
+	if not path.exists('.logs'):
+		makedirs('.logs')
+
+	logger = logging.getLogger(__name__)
+	logger.setLevel(logging.DEBUG)
+	fh = logging.FileHandler('.logs/music.log')
+	formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
+	fh.setFormatter(formatter)
+	logger.addHandler(fh)
+
 	bot.add_cog(Music(bot))
 
 def format_time(d):

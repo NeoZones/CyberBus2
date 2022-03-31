@@ -5,7 +5,6 @@ import re
 def setup(bot):
 	bot.add_cog(Sus(bot))
 
-
 class Sus(Cog):
 	"""Obviate the need for ByteMoth"""
 	def __init__(self, bot):

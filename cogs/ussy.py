@@ -5,7 +5,6 @@ import re
 def setup(bot):
 	bot.add_cog(Ussy(bot))
 
-
 class Ussy(Cog):
 	"""Negative reinforcement for alph's brain"""
 	def __init__(self, bot):

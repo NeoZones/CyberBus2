@@ -4,17 +4,17 @@ from os import path, makedirs
 import logging
 from datetime import datetime
 
-if not path.exists('.logs'):
-	makedirs('.logs')
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('.logs/btmoment.log')
-formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
-fh.setFormatter(formatter)
-logger.addHandler(fh)
-
 def setup(bot):
+	if not path.exists('.logs'):
+		makedirs('.logs')
+
+	logger = logging.getLogger(__name__)
+	logger.setLevel(logging.DEBUG)
+	fh = logging.FileHandler('.logs/btmoment.log')
+	formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
+	fh.setFormatter(formatter)
+	logger.addHandler(fh)
+	
 	bot.add_cog(BTMoment(bot))
 
 class BTMoment(Cog):
@@ -45,12 +45,6 @@ class BTMoment(Cog):
 		m2 = history[1] # second-to-last message
 		m1 = history[0] # last message
 
-		logger.debug(f"{m2.embeds[0].description=}")
-		logger.debug(f"{m1.embeds[0].description=}")
-
-		logger.debug(f"{m1.created_at=}")
-		logger.debug(f"{datetime.now()=}")
-
 		bt_moment = False
 
 		if ( # last 2 messages from ricky had embeds where owly left then joined
@@ -64,16 +58,16 @@ class BTMoment(Cog):
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (m2.created_at - m1.created_at).total_seconds() < 120
 		):
-			logger.debug("BTMoment event was received after VCJoin event")
+			logger.info("BTMoment event was received after VCJoin event")
 			bt_moment = True
 		elif ( # last message from ricky had embed where owly left
 			m1.author.id == self.bot.user.id
 			and m1.embeds
 			and "left" in m1.embeds[0].description
 			and "Owly#6604" in m1.embeds[0].author.name
-			and (datetime.now() - m1.created_at).total_seconds() < 120
+			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() < 120
 		):
-			logger.debug("BTMoment event was received before VCJoin event")
+			logger.info("BTMoment event was received before VCJoin event")
 			bt_moment = True
 
 		if not bt_moment:
