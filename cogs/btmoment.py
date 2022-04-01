@@ -58,6 +58,7 @@ class BTMoment(Cog):
 			and "Owly#6604" in m2.embeds[0].author.name
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (m2.created_at - m1.created_at).total_seconds() < 120
+			and (m2.created_at - m1.created_at).total_seconds() > 5
 		):
 			logger.info("BTMoment event was received after VCJoin event")
 			bt_moment = True
@@ -67,6 +68,7 @@ class BTMoment(Cog):
 			and "left" in m1.embeds[0].description
 			and "Owly#6604" in m1.embeds[0].author.name
 			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() < 120
+			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() > 5
 		):
 			logger.info("BTMoment event was received before VCJoin event")
 			bt_moment = True
