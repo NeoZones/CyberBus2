@@ -74,7 +74,7 @@ class BTMoment(Cog):
 		if not bt_moment:
 			return
 
-		msg = await self.channel.send("bt moment")
+		msg = await self.channel.send("BT moment")
 		if msg:
-			logger.info("Message sent: bt moment")
+			logger.info("Message sent: BT moment")
 
