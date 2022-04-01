@@ -214,7 +214,8 @@ class Music(Cog):
 		try:
 			i = int(query) - 1
 		except ValueError:
-			return await ctx.send(f"Please provide an integer between 1 and {self.MAX_RESULTS}")
+			logger.info(f"performing a search result")
+			return await self.search_youtube(ctx, query=query)
 		if i not in range(self.MAX_RESULTS + 1):
 			return await ctx.send(f"Please provide an integer between 1 and {self.MAX_RESULTS}")
 		url = f"https://youtube.com{self.search_results['entries'][i]['url_suffix']}"
