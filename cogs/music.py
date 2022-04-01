@@ -217,7 +217,7 @@ class Music(Cog):
 			return await ctx.send(f"Please provide an integer between 1 and {self.MAX_RESULTS}")
 		if i not in range(self.MAX_RESULTS + 1):
 			return await ctx.send(f"Please provide an integer between 1 and {self.MAX_RESULTS}")
-		url = f"https://youtube.com{self.search_results[i]['url_suffix']}"
+		url = f"https://youtube.com{self.search_results['entries'][i]['url_suffix']}"
 		self.search_results = []
 		logger.info(f"handling a prior search")
 		return await self.get_tracks_from_url(ctx, url)
