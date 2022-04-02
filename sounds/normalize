@@ -1,14 +1,14 @@
 #!/bin/bash
 
 echo "Processing file $1";
-DIR="$(dirname $1 | awk '{ print substr ($0, 13)}')"/;
+DIR="$(dirname "$1" | awk '{ print substr ($0, 13)}')"/;
 if [ $DIR = "/" ]
 then
 	DIR=""
 fi
 mkdir -p ./normalized/$DIR
-ffmpeg-normalize $1 \
+ffmpeg-normalize "$1" \
 	-ar 48000 \
 	-c:a libopus \
 	-ofmt opus \
-	-o normalized/$DIR$(basename $1)
+	-o normalized/$DIR$(basename "$1")
