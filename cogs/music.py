@@ -716,7 +716,7 @@ class Music(Cog):
 		if subdirectory:
 			path += f"/{subdirectory}"
 		cmd = subprocess.run(
-			f"cd sounds/normalized && find {path} -type f",
+			f"cd sounds/normalized && find {path} -type f | sort",
 			shell=True,
 			stdout=subprocess.PIPE,
 			stderr=subprocess.STDOUT
