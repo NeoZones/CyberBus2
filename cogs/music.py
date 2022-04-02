@@ -468,7 +468,7 @@ class Music(Cog):
 		query: str,
 		top: bool = False
 	):
-		logger.debug("add_to_queue() called")
+		logger.debug(f"add_to_queue({query}) called")
 		# Check for permission to add tracks
 		allowed = self.check_for_numbers(ctx)
 		if not allowed:

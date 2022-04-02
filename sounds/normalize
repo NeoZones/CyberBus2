@@ -11,4 +11,4 @@ ffmpeg-normalize "$1" \
 	-ar 48000 \
 	-c:a libopus \
 	-ofmt opus \
-	-o normalized/$DIR$(basename "$1")
+	-o "normalized/$DIR$(basename "$1")"
