@@ -453,9 +453,15 @@ class Music(Cog):
 		"""anti numbers action"""
 		logger.debug("check_for_numbers() called")
 		NUMBERS = 187024083471302656
+		PIZZA = 320294046935547905
 		RICKY = 949503750651936828
-		if ctx.author.id != NUMBERS:
-			return True
+		if ctx.author.id in [
+			NUMBERS,
+			PIZZA,
+		]:
+			return False 
+		#if ctx.author.id != NUMBERS:
+		#	return False
 		# if ctx.author.voice:
 		# 	members = ctx.author.voice.channel.members
 		# 	current_vc_members = {member.id for member in members}
@@ -473,10 +479,11 @@ class Music(Cog):
 		allowed = self.check_for_numbers(ctx)
 		if not allowed:
 			logger.info(f"{ctx.author} is not allowed to add to queue")
-			return await ctx.send(
-			"You must be in a voice chat by yourself "
-			"in order to use this command."
-			)
+			#return await ctx.send(
+			#"You must be in a voice chat by yourself "
+			#"in order to use this command."
+			#)
+			return await ctx.send("No 💜")
 		# Ensure we are connected to voice
 		if not ctx.voice_client:
 			logger.warning("no voice client")
