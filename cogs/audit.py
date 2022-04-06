@@ -371,12 +371,6 @@ class Audit(Cog):
 				for role in roles_removed:
 					embed.description += f"  - {role}\n"
 
-		if before.default_auto_archive_duration != after.default_auto_archive_duration:
-			logger.info("default_auto_archive_duration not equal")
-			logger.debug(f"{before.default_auto_archive_duration=}")
-			logger.debug(f"{after.default_auto_archive_duration=}")
-			embed.description += f"- {after.mention} changed auto-archive duration from {before.default_auto_archive_duration} minutes to {after.default_auto_archive_duration} minutes\n"
-
 		if before.members != after.members:
 			logger.info("members not equal")
 			logger.debug(f"{before.members=}")
@@ -448,32 +442,40 @@ class Audit(Cog):
 			logger.info("permissions_synced: true -> false")
 			embed.description += f"- Permissions for {after.mention} were unsynced with {after.category}\n"
 
-		if before.slowmode_delay != after.slowmode_delay:
-			logger.info("slowmode_delay not equal")
-			logger.debug(f"{before.slowmode_delay=}")
-			logger.debug(f"{after.slowmode_delay=}")
-			embed.description += f"- Slowmode delay for {after.mention} was changed from {before.slowmode_delay} seconds to {after.slowmode_delay} seconds\n"
-
-		if before.topic != after.topic:
-			logger.info("topic not equal")
-			logger.debug(f"{before.topic=}")
-			logger.debug(f"{after.topic=}")
-			embed.description += f"- Topic changed for {after.mention}\n"
-			embed = embed.add_field(
-				name = "Before",
-				value = before.topic,
-				inline = False,
-			).add_field(
-				name = "After",
-				value = after.topic,
-				inline = False
-			)
-
 		if before.type != after.type:
 			logger.info("type not equal")
 			logger.debug(f"{before.type=}")
 			logger.debug(f"{after.type=}")
 			embed.description = f"- The channel type of {after.mention} was changed from {before.type} to {after.type}\n"
+
+		if before.type != discord.ChannelType.voice:
+
+			if before.default_auto_archive_duration != after.default_auto_archive_duration:
+				logger.info("default_auto_archive_duration not equal")
+				logger.debug(f"{before.default_auto_archive_duration=}")
+				logger.debug(f"{after.default_auto_archive_duration=}")
+				embed.description += f"- {after.mention} changed auto-archive duration from {before.default_auto_archive_duration} minutes to {after.default_auto_archive_duration} minutes\n"
+
+			if before.slowmode_delay != after.slowmode_delay:
+				logger.info("slowmode_delay not equal")
+				logger.debug(f"{before.slowmode_delay=}")
+				logger.debug(f"{after.slowmode_delay=}")
+				embed.description += f"- Slowmode delay for {after.mention} was changed from {before.slowmode_delay} seconds to {after.slowmode_delay} seconds\n"
+
+			if before.topic != after.topic:
+				logger.info("topic not equal")
+				logger.debug(f"{before.topic=}")
+				logger.debug(f"{after.topic=}")
+				embed.description += f"- Topic changed for {after.mention}\n"
+				embed = embed.add_field(
+					name = "Before",
+					value = before.topic,
+					inline = False,
+				).add_field(
+					name = "After",
+					value = after.topic,
+					inline = False
+				)
 
 		# if after.type == discord.ChannelType.voice:
 		# 	pass
