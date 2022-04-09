@@ -17,7 +17,7 @@ class Ussy(Cog):
 			return
 		r = re.compile(
 			r'''
-			\b.*ussy\b
+			\b[a-zA-Z]*ussy\b
 			''',
 			re.VERBOSE | re.IGNORECASE
 			)
