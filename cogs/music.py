@@ -408,6 +408,8 @@ class Music(Cog):
 		if ctx.voice_client.is_playing():
 			return
 
+		logger.info(f"{self.track=}")
+
 		if self.repeat_mode == Music.REPEAT_NONE:
 			self.track = self.q.pop(0)
 			logger.info("Repeat none -- popped track from queue")
@@ -420,6 +422,8 @@ class Music(Cog):
 				self.i = 0
 			self.track = self.q[self.i]
 			logger.info("Repeat all -- advancing pointer without popping track")
+
+		logger.info(f"{self.track=}")
 
 		if self.track.source.startswith('http'):
 			player = await Player.prepare_stream(self.track, loop = self.bot.loop)
