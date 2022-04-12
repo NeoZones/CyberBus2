@@ -668,7 +668,7 @@ class Music(Cog):
 		logger.info(".shuffle")
 		if not self.q:
 			return await ctx.send("There is no queue to shuffle")
-		self.q = random.shuffle(self.q)
+		random.shuffle(self.q)
 		msg = await ctx.send("Queue has been shuffled")
 		if msg:
 			logger.info("Message sent: Queue has been shuffled")
