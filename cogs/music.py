@@ -41,7 +41,6 @@ class Player(discord.PCMVolumeTransformer):
 		source,
 		duration,
 		*,
-		query = None,
 		data = None,
 		ffmpeg_options = {"options": "-vn"},
 	):
@@ -50,14 +49,13 @@ class Player(discord.PCMVolumeTransformer):
 		self.source = source
 		self.duration = duration
 		self.data = data
-		self.query = query
 		logger.info(f"Player created for {source}")
 	
 	@classmethod
 	async def prepare_file(cls, track, *, loop):
 		loop = loop or asyncio.get_event_loop()
 		logger.info(f"Preparing player from file: {track.source}")
-		return cls(track.source, track.duration, data = track.data, query = track.source, ffmpeg_options = {"options": "-vn"})
+		return cls(track.source, track.duration, data = track.data, ffmpeg_options = {"options": "-vn"})
 
 	@classmethod
 	async def prepare_stream(cls, track, *, loop):
@@ -66,7 +64,7 @@ class Player(discord.PCMVolumeTransformer):
 		to_run = partial(ytdl.extract_info, url = track.source, download = False)
 		data = await loop.run_in_executor(None, to_run)
 		logger.info(f"Stream URL: {data['url']}")
-		return cls(data['url'], track.duration, data = data, query = track.source, ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"})
+		return cls(data['url'], track.duration, data = data, ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"})
 
 	def __repr__(self):
 		return ''.join([f"{key=}\n" for key in self.__dict__])
@@ -602,7 +600,7 @@ class Music(Cog):
 		source = ctx.voice_client.source
 		embed = discord.Embed(
 				title=f"{self.track.title}",
-				url=f"{self.track.query}",
+				url=f"{self.track.source}",
 			).add_field(
 				name="Progress",
 				value=f"{source.progress}",
