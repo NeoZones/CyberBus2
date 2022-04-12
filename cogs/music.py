@@ -412,13 +412,16 @@ class Music(Cog):
 
 		if self.repeat_mode == Music.REPEAT_NONE:
 			self.track = self.q.pop(0)
+			logger.info("Repeat none -- popped track from queue")
 		elif self.repeat_mode == Music.REPEAT_ONE:
 			self.track = self.track
+			logger.info("Repeat one -- keeping track the same")
 		elif self.repeat_mode == Music.REPEAT_ALL:
 			self.i += 1
 			if self.i >= len(self.q):
 				self.i = 0
 			self.track = self.q[self.i]
+			logger.info("Repeat all -- advancing pointer without popping track")
 
 		if self.track.source.startswith('http'):
 			player = await Player.prepare_stream(self.track, loop = self.bot.loop)
@@ -670,7 +673,14 @@ class Music(Cog):
 		logger.info(".shuffle")
 		if not self.q:
 			return await ctx.send("There is no queue to shuffle")
+
+		logger.debug(f"{self.track=}")
+		logger.debug(f"{self.q=}")
+
 		random.shuffle(self.q)
+
+		logger.debug(f"{self.track=}")
+		logger.debug(f"{self.q=}")
 		msg = await ctx.send("Queue has been shuffled")
 		if msg:
 			logger.info("Message sent: Queue has been shuffled")
