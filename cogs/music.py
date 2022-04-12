@@ -602,7 +602,7 @@ class Music(Cog):
 		source = ctx.voice_client.source
 		embed = discord.Embed(
 				title=f"{self.track.title}",
-				url=f"{self.track.url}",
+				url=f"{self.track.query}",
 			).add_field(
 				name="Progress",
 				value=f"{source.progress}",
