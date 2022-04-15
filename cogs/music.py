@@ -411,6 +411,8 @@ class Music(Cog):
 		logger.info(f"{self.track=}")
 
 		if self.repeat_mode == Music.REPEAT_NONE:
+			if not self.q:
+				return await ctx.send("Finished playing queue.")
 			self.track = self.q.pop(0)
 			logger.info("Repeat none -- popped track from queue")
 		elif self.repeat_mode == Music.REPEAT_ONE:
@@ -426,6 +428,16 @@ class Music(Cog):
 		logger.info(f"{self.track=}")
 
 		if self.track.source.startswith('http'):
+			# detect private or unplayable videos here
+			try:
+				data = ytdl.extract_info(self.track.source, download=False)
+				logger.debug(f"{data=}")
+			except Exception as e:
+				logger.error("Exception thrown!")
+				logger.error(f"{e=}")
+				await ctx.send("Video unplayable -- skipping")
+				logger.warning(f"Skipping as unplayable: {self.track.source}")
+				return await play_next(self, ctx)
 			player = await Player.prepare_stream(self.track, loop = self.bot.loop)
 		else:
 			player = await Player.prepare_file(self.track, loop = self.bot.loop)
