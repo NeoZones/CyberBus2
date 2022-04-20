@@ -46,6 +46,13 @@ class BTMoment(Cog):
 		m2 = history[1] # second-to-last message
 		m1 = history[0] # last message
 
+		logger.debug(f"{m1.embeds[0].description=}")
+		logger.debug(f"{m2.embeds[0].description=}")
+		logger.debug(f"{m1.embeds[0].author.name=}")
+		logger.debug(f"{m2.embeds[0].author.name=}")
+		logger.debug(f"{(m2.created_at - m1.created_at).total_seconds()=}")
+		logger.debug(f"{(datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds()=}")
+
 		bt_moment = False
 
 		if ( # last 2 messages from ricky had embeds where owly left then joined
@@ -57,7 +64,7 @@ class BTMoment(Cog):
 			and "joined" in m1.embeds[0].description
 			and "Owly#6604" in m2.embeds[0].author.name
 			and "Owly#6604" in m1.embeds[0].author.name
-			and (m2.created_at - m1.created_at).total_seconds() < 300
+			and (m2.created_at - m1.created_at).total_seconds() < 600
 			and (m2.created_at - m1.created_at).total_seconds() > 5
 		):
 			logger.info("BTMoment event was received after VCJoin event")
@@ -67,7 +74,7 @@ class BTMoment(Cog):
 			and m1.embeds
 			and "left" in m1.embeds[0].description
 			and "Owly#6604" in m1.embeds[0].author.name
-			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() < 300
+			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() < 600
 			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() > 5
 		):
 			logger.info("BTMoment event was received before VCJoin event")
