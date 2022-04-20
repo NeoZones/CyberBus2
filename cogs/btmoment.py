@@ -2,7 +2,7 @@ import discord
 from discord.ext.commands import Cog
 from os import path, makedirs
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 if not path.exists('.logs'):
 	makedirs('.logs')
@@ -45,11 +45,13 @@ class BTMoment(Cog):
 		history = await self.channel.history(limit=2).flatten()
 		m2 = history[1] # second-to-last message
 		m1 = history[0] # last message
-
-		logger.debug(f"{m1.embeds[0].description=}")
-		logger.debug(f"{m2.embeds[0].description=}")
-		logger.debug(f"{m1.embeds[0].author.name=}")
-		logger.debug(f"{m2.embeds[0].author.name=}")
+		if m1.embeds:
+			logger.debug(f"{m1.embeds[0].author.name=}")
+			logger.debug(f"{m1.embeds[0].description=}")
+		if m2.embeds:
+			logger.debug(f"{m2.embeds[0].description=}")
+			logger.debug(f"{m2.embeds[0].author.name=}")
+		
 		logger.debug(f"{(m2.created_at - m1.created_at).total_seconds()=}")
 		logger.debug(f"{(datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds()=}")
 
@@ -74,8 +76,8 @@ class BTMoment(Cog):
 			and m1.embeds
 			and "left" in m1.embeds[0].description
 			and "Owly#6604" in m1.embeds[0].author.name
-			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() < 600
-			and (datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds() > 5
+			and (datetime.now(timezone.utc) - m1.created_at).total_seconds() < 600
+			and (datetime.now(timezone.utc) - m1.created_at).total_seconds() > 5
 		):
 			logger.info("BTMoment event was received before VCJoin event")
 			bt_moment = True
