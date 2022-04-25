@@ -437,7 +437,7 @@ class Music(Cog):
 				logger.error(f"{e=}")
 				await ctx.send("Video unplayable -- skipping")
 				logger.warning(f"Skipping as unplayable: {self.track.source}")
-				return await self.play_next(self, ctx)
+				return await self.play_next(ctx)
 			player = await Player.prepare_stream(self.track, loop = self.bot.loop)
 		else:
 			player = await Player.prepare_file(self.track, loop = self.bot.loop)
