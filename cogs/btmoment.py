@@ -53,7 +53,7 @@ class BTMoment(Cog):
 			logger.debug(f"{m2.embeds[0].author.name=}")
 		
 		logger.debug(f"{(m2.created_at - m1.created_at).total_seconds()=}")
-		logger.debug(f"{(datetime.now(datetime.timezone.utc) - m1.created_at).total_seconds()=}")
+		logger.debug(f"{(datetime.now(timezone.utc) - m1.created_at).total_seconds()=}")
 
 		bt_moment = False
 
