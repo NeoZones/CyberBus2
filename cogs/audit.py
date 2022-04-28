@@ -716,22 +716,17 @@ class Audit(Cog):
 		# haven't gotten this to work... before == after for some reason,
 		# even after updating my avatar multiple times.
 		# maybe on_user_update?
-		if before.display_avatar.url != after.display_avatar.url:
-			logger.info("display_avatar.url not equal")
-			logger.debug(f"{before.display_avatar.url=}")
-			logger.debug(f"{after.display_avatar.url=}")
-			embed.description = f"{after.mention} changed their avatar"
-			embed = embed.add_field(
-				name = "Before",
-				value = before.display_avatar.url,
-			).add_field(
-				name = "After",
-				value = after.display_avatar.url,
-			)
-			msg =  await self.channel.send(embed = embed)
-			if msg:
-				logger.info("on_member_update sent to channel\n")
-			return
+		# if before.display_avatar.url != after.display_avatar.url:
+		# 	logger.info("display_avatar.url not equal")
+		# 	embed.description = f"{after.mention} changed their avatar"
+		# 	embed = embed.add_field(
+		# 		name = "New avatar URL",
+		# 		value = after.display_avatar.url,
+		# 	)
+		# 	msg =  await self.channel.send(embed = embed)
+		# 	if msg:
+		# 		logger.info("on_member_update sent to channel\n")
+		# 	return
 
 		if after.timed_out and not before.timed_out: # idk how to time out people
 			logger.info("timed_out: false -> true")
@@ -847,14 +842,9 @@ class Audit(Cog):
 
 		if before.display_avatar.url != after.display_avatar.url:
 			logger.info("display_avatar.url not equal")
-			logger.debug(f"{before.display_avatar.url=}")
-			logger.debug(f"{after.display_avatar.url=}")
 			embed.description = f"{after.mention} changed their avatar"
 			embed = embed.add_field(
-				name = "Before",
-				value = before.display_avatar.url,
-			).add_field(
-				name = "After",
+				name = "New avatar URL",
 				value = after.display_avatar.url,
 			)
 			msg =  await self.channel.send(embed = embed)
