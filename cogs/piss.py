@@ -27,7 +27,8 @@ class Piss(Cog):
 			''',
 			re.VERBOSE | re.IGNORECASE
 			)
-		if piss.findall(message.content):
-			await message.reply("I have kinks!", mention_author=False)
-		elif kink.findall(message.content):
+		
+		if kink.findall(message.content):
 			await message.reply("I have kinks! PISS", mention_author=False)
+		# elif piss.findall(message.content):
+		# 	await message.reply("I have kinks!", mention_author=False)
