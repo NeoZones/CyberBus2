@@ -435,7 +435,7 @@ class Music(Cog):
 			except Exception as e:
 				logger.error("Exception thrown!")
 				logger.error(f"{e=}")
-				await ctx.send("Video unplayable -- skipping")
+				await ctx.send(f"`{self.track.source}` is unplayable -- skipping")
 				logger.warning(f"Skipping as unplayable: {self.track.source}")
 				return await self.play_next(ctx)
 			player = await Player.prepare_stream(self.track, loop = self.bot.loop)
