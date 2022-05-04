@@ -8,14 +8,14 @@ if not path.exists('.logs'):
 		makedirs('.logs')
 		
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 fh = logging.FileHandler('.logs/audit.log')
 formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
 fh.setFormatter(formatter)
 if not len(logger.handlers):
 	logger.addHandler(fh)
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(Audit(bot))
 
 class Audit(Cog):
@@ -25,10 +25,10 @@ class Audit(Cog):
 	#CHANNEL = 951378341162807387 # bot-test channel
 	GUILD = int(getenv("GUILD_ID"))
 
-	def __init__(self, bot):
-		self.bot = bot
-		self.channel = self.bot.get_channel(Audit.CHANNEL)
-		self.guild = self.bot.get_guild(Audit.GUILD)
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
+		self.channel: discord.TextChannel = self.bot.get_channel(Audit.CHANNEL)
+		self.guild: discord.Guild = self.bot.get_guild(Audit.GUILD)
 		print("Initialized Audit cog")
 
 	@Cog.listener()
@@ -40,7 +40,9 @@ class Audit(Cog):
 	# MESSAGES ==================================================================
 
 	@Cog.listener()
-	async def on_message_delete(self, message):
+	async def on_message_delete(
+		self,
+		message: discord.Message):
 		"""Log deleted messages (if in cache)"""
 		logger.info("on_message_delete received")
 		logger.debug(f"{message=}")
@@ -117,7 +119,10 @@ class Audit(Cog):
 	# 	)
 
 	@Cog.listener()
-	async def on_message_edit(self, before, after):
+	async def on_message_edit(
+		self,
+		before: discord.Message,
+		after: discord.Message):
 		"""Log edited and updated messages (if in cache)"""
 		logger.info("on_message_edit received")
 		logger.debug(f"{before=}")
@@ -281,7 +286,9 @@ class Audit(Cog):
 	# CHANNELS ==================================================================
 
 	@Cog.listener()
-	async def on_guild_channel_create(self, channel):
+	async def on_guild_channel_create(
+		self,
+		channel: discord.abc.GuildChannel | discord.TextChannel | discord.VoiceChannel):
 		"""Log created channels"""
 		logger.info("on_guild_channel_create received")
 		logger.debug(f"{channel=}")
@@ -302,7 +309,9 @@ class Audit(Cog):
 			logger.info("on_guild_channel_create sent to channel\n")
 
 	@Cog.listener()
-	async def on_guild_channel_delete(self, channel):
+	async def on_guild_channel_delete(
+		self,
+		channel: discord.abc.GuildChannel | discord.TextChannel | discord.VoiceChannel):
 		"""Log deleted channels"""
 		logger.info("on_guild_channel_delete received")
 		logger.debug(f"{channel=}")
@@ -320,7 +329,10 @@ class Audit(Cog):
 			logger.info("on_guild_channel_delete sent to channel\n")
 
 	@Cog.listener()
-	async def on_guild_channel_update(self, before, after):
+	async def on_guild_channel_update(
+		self,
+		before: discord.abc.GuildChannel | discord.TextChannel | discord.VoiceChannel,
+		after: discord.abc.GuildChannel | discord.TextChannel | discord.VoiceChannel):
 		"""Log updated channels"""
 		logger.info("on_guild_channel_update received")
 		logger.debug(f"{before=}")
@@ -530,7 +542,9 @@ class Audit(Cog):
 	# INTEGRATIONS ==============================================================
 
 	@Cog.listener()
-	async def on_integration_create(self, integration):
+	async def on_integration_create(
+		self,
+		integration: discord.Integration | discord.BotIntegration):
 		"""Log created integrations"""
 		logger.info("on_integration_create received")
 		logger.debug(f"{integration=}")
@@ -565,7 +579,9 @@ class Audit(Cog):
 			logger.info("on_integration_create sent to channel\n")
 
 	@Cog.listener()
-	async def on_integration_update(self, integration):
+	async def on_integration_update(
+		self,
+		integration: discord.Integration | discord.BotIntegration):
 		"""Log updated integrations""" # when is this actually called???
 		logger.info("on_integration_update received")
 		logger.debug(f"{integration=}")
@@ -599,7 +615,7 @@ class Audit(Cog):
 			logger.info("on_integration_update sent to channel\n")
 
 	@Cog.listener()
-	async def on_raw_integration_delete(self, payload):
+	async def on_raw_integration_delete(self, payload: discord.RawIntegrationDeleteEvent):
 		"""Log deleted integrations"""
 		logger.info("on_raw_integration_delete received")
 		logger.debug(f"{payload=}")
@@ -634,7 +650,10 @@ class Audit(Cog):
 	# 	# we use the Immigration extension for this
 
 	@Cog.listener()
-	async def on_member_update(self, before, after):
+	async def on_member_update(
+		self,
+		before: discord.Member,
+		after: discord.Member):
 		"""Log updated members (nicknames, roles, timeouts, permissions)"""
 		logger.info("on_member_update received")
 		logger.debug(f"{before=}")
@@ -824,7 +843,10 @@ class Audit(Cog):
 		logger.warning("on_member_update not handled\n")
 
 	@Cog.listener()
-	async def on_user_update(self, before, after):
+	async def on_user_update(
+		self,
+		before: discord.User,
+		after: discord.User):
 		"""Log updated users (username, avatar, discriminator)"""
 
 		logger.info("on_user_update received")
@@ -874,7 +896,9 @@ class Audit(Cog):
 	# ROLES =====================================================================
 
 	@Cog.listener()
-	async def on_guild_role_create(self, role):
+	async def on_guild_role_create(
+		self,
+		role: discord.Role):
 		"""Log created roles"""
 		logger.info("on_guild_role_create received")
 		logger.debug(f"{role=}")
@@ -896,7 +920,9 @@ class Audit(Cog):
 			logger.info("on_guild_role_create sent to channel\n")
 
 	@Cog.listener()
-	async def on_guild_role_delete(self, role):
+	async def on_guild_role_delete(
+		self,
+		role: discord.Role):
 		"""Log deleted roles"""
 		logger.info("on_guild_role_delete received")
 		logger.debug(f"{role=}")
@@ -918,7 +944,10 @@ class Audit(Cog):
 			logger.info("on_guild_role_delete sent to channel\n")
 
 	@Cog.listener()
-	async def on_guild_role_update(self, before, after):
+	async def on_guild_role_update(
+		self,
+		before: discord.Role,
+		after: discord.Role):
 		"""Log updated roles"""
 		logger.info("on_guild_role_update received")
 		logger.debug(f"{before=}")
@@ -1027,7 +1056,11 @@ class Audit(Cog):
 	# EMOJIS AND STICKERS =======================================================
 
 	@Cog.listener()
-	async def on_guild_emojis_update(self, guild, before, after):
+	async def on_guild_emojis_update(
+		self,
+		guild: discord.Guild,
+		before: list[discord.Emoji],
+		after: list[discord.Emoji]):
 		"""Log added or removed emojis"""
 		logger.info("on_guild_emojis_update received")
 		logger.debug(f"{before=}")
@@ -1067,7 +1100,11 @@ class Audit(Cog):
 			logger.info("on_guild_emojis_update sent to channel\n")
 
 	@Cog.listener()
-	async def on_guild_stickers_update(self, guild, before, after):
+	async def on_guild_stickers_update(
+		self,
+		guild: discord.Guild,
+		before: list[discord.Sticker],
+		after: list[discord.Sticker]):
 		"""Log added or removed stickers"""
 		logger.info("on_guild_stickers_update received")
 		logger.debug(f"{before=}")
@@ -1106,7 +1143,9 @@ class Audit(Cog):
 	# INVITES ===================================================================
 
 	@Cog.listener()
-	async def on_invite_create(self, invite):
+	async def on_invite_create(
+		self,
+		invite: discord.Invite):
 		"""Log created invites"""
 		logger.info("on_invite_create received")
 		logger.debug(f"{invite=}")
@@ -1141,7 +1180,9 @@ class Audit(Cog):
 			logger.info("on_invite_create sent to channel\n")
 
 	@Cog.listener()
-	async def on_invite_delete(self, invite):
+	async def on_invite_delete(
+		self,
+		invite: discord.Invite):
 		"""Log deleted invites"""
 		logger.info("on_invite_delete received")
 		logger.debug(f"{invite=}")

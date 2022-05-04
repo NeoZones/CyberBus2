@@ -136,7 +136,7 @@ class Music(Cog):
 	PAGE_SIZE = 10
 
 	def __init__(self, bot: discord.Bot):
-		self.bot = bot
+		self.bot: discord.Bot = bot
 		self.q: list[Track] = []
 		self.track: Track | None = None
 		self.repeat_mode = Music.REPEAT_NONE

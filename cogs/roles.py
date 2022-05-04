@@ -3,14 +3,14 @@ from discord.ext.commands import Cog
 from discord.commands import slash_command, Option
 from os import getenv
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(Roles(bot))
 
 class Roles(Cog):
 	"""Let users choose their roles"""
 
-	def __init__(self, bot):
-		self.bot = bot
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
 		print("Initialized Roles cog")
 	
 	roles = {
@@ -129,7 +129,7 @@ class Roles(Cog):
 		if role:
 			await member.remove_roles(role)
 
-	async def get_colors(self, ctx: discord.AutocompleteContext):
+	async def get_colors(self, ctx: discord.AutocompleteContext) -> list[str]:
 		"""Returns a list of colors matching the partial input"""
 		COLORS = [
 			"Light Red",

@@ -2,17 +2,17 @@ import discord
 from discord.ext.commands import Cog
 import re
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(Sus(bot))
 
 class Sus(Cog):
 	"""Obviate the need for ByteMoth"""
-	def __init__(self, bot):
-		self.bot = bot
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
 		print("Initialized Sus cog")
 
 	@Cog.listener()
-	async def on_message(self, message):
+	async def on_message(self, message: discord.Message):
 		if message.author.id == self.bot.user.id:
 			return
 		r = re.compile(

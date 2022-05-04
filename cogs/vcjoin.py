@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Cog
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(VCJoin(bot))
 
 class VCJoin(Cog):
@@ -9,9 +9,9 @@ class VCJoin(Cog):
 
 	CHANNEL = 620028244887994408
 
-	def __init__(self, bot):
-		self.bot = bot
-		self.channel = self.bot.get_channel(VCJoin.CHANNEL)
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
+		self.channel: discord.TextChannel = self.bot.get_channel(VCJoin.CHANNEL)
 		print("Initialized VCJoin cog")
 
 	@Cog.listener()
@@ -20,7 +20,11 @@ class VCJoin(Cog):
 		self.channel = self.bot.get_channel(VCJoin.CHANNEL)
 
 	@Cog.listener()
-	async def on_voice_state_update(self, member, before, after):
+	async def on_voice_state_update(
+		self,
+		member: discord.Member,
+		before: discord.VoiceState,
+		after: discord.VoiceState):
 		"""Log when someone joins or leaves VC"""
 		if before.channel == after.channel:
 			return

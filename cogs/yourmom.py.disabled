@@ -1,17 +1,17 @@
 import discord
 from discord.ext.commands import Cog
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(YourMom(bot))
 
 class YourMom(Cog):
 	"""Old joke is old, blame pizza"""
-	def __init__(self, bot):
-		self.bot = bot
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
 		print("Initialized YourMom cog")
 
 	@Cog.listener()
-	async def on_message(self, message):
+	async def on_message(self, message: discord.Message):
 		if message.author.id == self.bot.user.id:
 			return
 		if "doing" in message.content.lower():

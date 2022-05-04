@@ -8,14 +8,14 @@ if not path.exists('.logs'):
 	makedirs('.logs')
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 fh = logging.FileHandler('.logs/btmoment.log')
 formatter = logging.Formatter('%(asctime)s | %(name)s | [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
 fh.setFormatter(formatter)
 if not len(logger.handlers):
 	logger.addHandler(fh)
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(BTMoment(bot))
 
 class BTMoment(Cog):
@@ -23,8 +23,8 @@ class BTMoment(Cog):
 
 	CHANNEL = 620028244887994408
 
-	def __init__(self, bot):
-		self.bot = bot
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
 		self.channel = self.bot.get_channel(BTMoment.CHANNEL)
 		print("Initialized BTMoment cog")
 
@@ -34,7 +34,7 @@ class BTMoment(Cog):
 		self.channel = self.bot.get_channel(BTMoment.CHANNEL)
 
 	@Cog.listener()
-	async def on_voice_state_update(self, member, before, after):
+	async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
 		if member.id != 257945316479729665: # ignore everyone except cass
 			return
 		if not after.channel: # ignore leaving -- only check for join or move

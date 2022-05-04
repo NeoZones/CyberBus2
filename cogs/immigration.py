@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Cog
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(Immigration(bot))
 
 class Immigration(Cog):
@@ -9,8 +9,8 @@ class Immigration(Cog):
 
 	CHANNEL = 620055960467275776
 
-	def __init__(self, bot):
-		self.bot = bot
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
 		print("Initialized Immigration cog")
 
 	@Cog.listener()
@@ -19,21 +19,21 @@ class Immigration(Cog):
 		self.channel = self.bot.get_channel(Immigration.CHANNEL)
 
 	@Cog.listener()
-	async def on_member_join(self, member):
+	async def on_member_join(self, member: discord.Member):
 		tag = member.mention
 		await self.channel.send(f'{tag} has arrived! We hope you enjoy your stay.')
 
 	@Cog.listener()
-	async def on_member_remove(self, member):
+	async def on_member_remove(self, member: discord.Member):
 		tag = member.mention
 		await self.channel.send(f'And then, {tag} left the Discord server.')
 
 	@Cog.listener()
-	async def on_member_ban(self, guild, user):
+	async def on_member_ban(self, guild: discord.Guild, user: discord.User):
 		tag = user.mention
 		await self.channel.send(f'{tag} has been exiled for their crimes against humanity!')
 
 	@Cog.listener()
-	async def on_member_unban(self, guild, user):
+	async def on_member_unban(self, guild: discord.Guild, user: discord.User):
 		tag = user.mention
 		await self.channel.send(f'{tag} has been forgiven for their crimes against humanity.')

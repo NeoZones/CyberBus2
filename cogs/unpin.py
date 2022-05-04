@@ -16,7 +16,7 @@ fh.setFormatter(formatter)
 if not len(logger.handlers):
 	logger.addHandler(fh)
 
-def setup(bot):
+def setup(bot: discord.Bot):
 	bot.add_cog(Unpin(bot))
 
 class Unpin(Cog):
@@ -24,8 +24,8 @@ class Unpin(Cog):
 
 	cache = set()
 
-	def __init__(self, bot):
-		self.bot = bot
+	def __init__(self, bot: discord.Bot):
+		self.bot: discord.Bot = bot
 		print("Initialized Unpin cog")
 
 	@Cog.listener()
@@ -59,7 +59,7 @@ class Unpin(Cog):
 				pickle.dump(Unpin.cache, f)
 
 	@Cog.listener()
-	async def on_raw_message_edit(self, payload):
+	async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):
 		guild_id = payload.guild_id
 		channel_id = payload.channel_id
 		message_id = payload.message_id
