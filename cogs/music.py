@@ -249,15 +249,15 @@ class Music(Cog):
 			title = entry["title"]
 			duration = None
 			data = entry
-			if not "duration" in entry and not "duration_string" in data:
+			if not "duration" in data and not "duration_string" in data:
 				logger.info("duration not found in entry's extracted data -- refetching")
 				logger.debug(f"{data=}")
 				start = time()
 				data = ytdl.extract_info(url, download=download)
 				logger.info(f"Refetching data took {time() - start} seconds")
-			if "duration" in entry:
+			if "duration" in data:
 				duration = data["duration"]
-			elif "duration_string" in entry:
+			elif "duration_string" in data:
 				d = [int(x) for x in data["duration_string"].split(':')]
 				if len(d) == 2:
 					m,s = d
