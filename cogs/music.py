@@ -637,6 +637,7 @@ class Music(Cog):
 			msg = await ctx.send("Bot is not currently connected to a voice channel")
 			if msg:
 				logger.info("Bot not connected to VC")
+			return
 		source: Player = ctx.voice_client.source
 		embed = discord.Embed(
 				title=f"{self.track.title}",
