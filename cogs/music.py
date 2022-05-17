@@ -233,7 +233,7 @@ class Music(Cog):
 		logger.debug(f"get_tracks_from_url() called for URL: {url}")
 		try:
 			data = ytdl.extract_info(url, download=download)
-			logger.debug(f"{data=}")
+			# logger.debug(f"{data=}")
 			# Detect tabs
 			if data['extractor'] == 'youtube:tab' and not "entries" in data:
 				logger.info("youtube:tab detected, no entries in data (so not a playlist)")
@@ -571,9 +571,9 @@ class Music(Cog):
 	async def play(self, ctx: Context, *, query: str):
 		"""Add track(s) to queue"""
 		if not query:
-			msg = await ctx.send("Nothing is currently playing")
+			msg = await ctx.send("No query detected")
 			if msg:
-				logger.info("Nothing is currently playing")
+				logger.info("Empty .play command was issued")
 			return
 		logger.info(f".play {query}")
 		return await self.add_to_queue(ctx, query, top=False)
@@ -582,9 +582,9 @@ class Music(Cog):
 	async def playtop(self, ctx: Context, *, query: str):
 		"""Add tracks to top of queue"""
 		if not query:
-			msg = await ctx.send("Nothing is currently playing")
+			msg = await ctx.send("No query detected")
 			if msg:
-				logger.info("Nothing is currently playing")
+				logger.info("Empty .playtop command was issued")
 			return
 		logger.info(f".playtop {query}")
 		return await self.add_to_queue(ctx, query, top=True)
