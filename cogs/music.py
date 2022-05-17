@@ -63,7 +63,12 @@ class Track:
 	def __str__(self):
 		title = f"**{self.title}**" if self.title else f"`{self.source}`"
 		duration = f" ({format_time(int(self.duration))})" if self.duration else " (?:??)"
-		return title + duration + f"\nRequested by {self.requester.display_name} ({self.requester})"
+		return (
+			title + duration + f"\nRequested by {self.requester.display_name} ({self.requester})"
+			if self.requester
+			else
+			title + duration + f"\nRequested by ???"
+		)
 
 class Player(discord.PCMVolumeTransformer):
 
@@ -565,12 +570,22 @@ class Music(Cog):
 	@command(aliases=['p', 'listen'])
 	async def play(self, ctx: Context, *, query: str):
 		"""Add track(s) to queue"""
+		if not query:
+			msg = await ctx.send("Nothing is currently playing")
+			if msg:
+				logger.info("Nothing is currently playing")
+			return
 		logger.info(f".play {query}")
 		return await self.add_to_queue(ctx, query, top=False)
 
 	@command(aliases=['ptop', 'top'])
 	async def playtop(self, ctx: Context, *, query: str):
 		"""Add tracks to top of queue"""
+		if not query:
+			msg = await ctx.send("Nothing is currently playing")
+			if msg:
+				logger.info("Nothing is currently playing")
+			return
 		logger.info(f".playtop {query}")
 		return await self.add_to_queue(ctx, query, top=True)
 	
@@ -595,7 +610,7 @@ class Music(Cog):
 			return
 		full_q = [self.track] + self.q
 		page = full_q[self.PAGE_SIZE*(p-1):self.PAGE_SIZE*p]
-		formatted_results = ""
+		formatted_results = f"{len(self.q)} tracks on queue.\n"
 		formatted_results += f"Page {p} of {math.ceil(len(full_q) / self.PAGE_SIZE)}:\n"
 		for i, track in enumerate(page):
 			if i == 0:
@@ -618,7 +633,11 @@ class Music(Cog):
 			if msg:
 				logger.info("Nothing is currently playing")
 			return
-		source = ctx.voice_client.source
+		if not ctx.voice_client:
+			msg = await ctx.send("Bot is not currently connected to a voice channel")
+			if msg:
+				logger.info("Bot not connected to VC")
+		source: Player = ctx.voice_client.source
 		embed = discord.Embed(
 				title=f"{self.track.title}",
 				url=f"{self.track.source}",
