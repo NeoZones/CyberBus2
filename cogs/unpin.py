@@ -26,11 +26,16 @@ class Unpin(Cog):
 
 	@Cog.listener()
 	async def on_guild_channel_pins_update(self, channel: discord.TextChannel | discord.Thread, last_pin):
-		logger.info(f"unpin detected")
 
 		guild = channel.guild
 
-		entry = await guild.audit_logs(limit=1,action=discord.AuditLogAction.message_unpin).flatten()
+		entry = await guild.audit_logs(limit=1).flatten()
+
+		if entry[0].action != discord.AuditLogAction.message_unpin:
+			return
+
+		logger.info(f"unpin detected")
+		
 		message_id = entry[0].extra.message_id
 		message = await channel.fetch_message(message_id)
 		url = f"https://discord.com/channels/{guild.id}/{channel.id}/{message.id}"
