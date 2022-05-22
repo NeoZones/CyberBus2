@@ -625,7 +625,7 @@ class Music(Cog):
 			formatted_results += (
 				f"{start+i+1}: {track}\n"
 			)
-			if p == 1 and i = 0: # add separator on first page for actually queued tracks
+			if p == 1 and i == 0: # add separator on first page for actually queued tracks
 				formatted_results += "=== Up next ===\n"
 		# send text to channel
 		msg = await ctx.send(formatted_results)
