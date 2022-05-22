@@ -604,22 +604,30 @@ class Music(Cog):
 	async def queue(self, ctx: Context, p: int = 1):
 		"""Show tracks up next"""
 		logger.info(f".queue {p}" if p else ".queue")
+		# check that there is a queue and a current track
 		if not self.q and not self.track:
 			msg = await ctx.send("The queue is currently empty.")
 			logger.info("Message sent: The queue is currently empty.")
 			return
-		full_q = [self.track] + self.q
-		page = full_q[self.PAGE_SIZE*(p-1):self.PAGE_SIZE*p]
+		# paginate the queue to just one page
+		full_queue = [self.track] + self.q
+		start = self.PAGE_SIZE * (p-1)
+		end = self.PAGE_SIZE * p
+		queue_page = full_queue[start:end]
+		# construct header
 		formatted_results = f"{len(self.q)} tracks on queue.\n"
-		formatted_results += f"Page {p} of {math.ceil(len(full_q) / self.PAGE_SIZE)}:\n"
-		for i, track in enumerate(page):
-			if i == 0:
+		total_pages = math.ceil(len(full_queue) / self.PAGE_SIZE)
+		formatted_results += f"Page {p} of {total_pages}:\n"
+		# construct page
+		for i, track in enumerate(queue_page):
+			if p == 0: # print nowplaying on first queue page
 				formatted_results += "=== Currently playing ===\n"
 			formatted_results += (
-				f"{(p-1)*self.PAGE_SIZE+i+1}: {track}\n"
+				f"{start+i+1}: {track}\n"
 			)
-			if i == 0:
+			if p == 0: # add separator on first page for actually queued tracks
 				formatted_results += "=== Up next ===\n"
+		# send text to channel
 		msg = await ctx.send(formatted_results)
 		if msg:
 			logger.info("Message sent: Sent queue page to channel")
