@@ -620,12 +620,12 @@ class Music(Cog):
 		formatted_results += f"Page {p} of {total_pages}:\n"
 		# construct page
 		for i, track in enumerate(queue_page):
-			if p == 0: # print nowplaying on first queue page
+			if p == 1: # print nowplaying on first queue page
 				formatted_results += "=== Currently playing ===\n"
 			formatted_results += (
 				f"{start+i+1}: {track}\n"
 			)
-			if p == 0: # add separator on first page for actually queued tracks
+			if p == 1: # add separator on first page for actually queued tracks
 				formatted_results += "=== Up next ===\n"
 		# send text to channel
 		msg = await ctx.send(formatted_results)
