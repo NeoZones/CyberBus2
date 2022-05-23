@@ -31,6 +31,8 @@ class Unpin(Cog):
 
 		entries = await guild.audit_logs(limit=1).flatten()
 		entry = entries[0]
+		if entry.action != discord.AuditLogAction.message_unpin:
+			return
 		message_id = entry.extra.message_id
 
 		# when a message is pinned, the last audit log entry
