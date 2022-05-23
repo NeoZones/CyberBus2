@@ -29,14 +29,15 @@ class Unpin(Cog):
 
 		guild = channel.guild
 
-		entry = await guild.audit_logs(limit=1).flatten()
+		entry: discord.AuditLogEntry = await guild.audit_logs(limit=1).flatten()[0]
 
-		if entry[0].action != discord.AuditLogAction.message_unpin:
-			return
+		logger.debug(f"{entry.created_at=}")
+		logger.debug(f"{last_pin=}")
+		logger.debug(f"{entry.action=}")
 
-		logger.info(f"unpin detected")
+		# logger.info(f"unpin detected")
 		
-		message_id = entry[0].extra.message_id
+		message_id = entry.extra.message_id
 		message = await channel.fetch_message(message_id)
 		url = f"https://discord.com/channels/{guild.id}/{channel.id}/{message.id}"
 
