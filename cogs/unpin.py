@@ -2,6 +2,7 @@ import discord
 from discord.ext.commands import Cog
 from os import path, makedirs
 import logging
+from time import time
 
 if not path.exists('.logs'):
 	makedirs('.logs')
@@ -26,10 +27,13 @@ class Unpin(Cog):
 
 	@Cog.listener()
 	async def on_guild_channel_pins_update(self, channel: discord.TextChannel | discord.Thread, last_pin):
-
+		logger.debug("message pinned or unpinned")
 		guild = channel.guild
 
+		start = time()
 		entries = await guild.audit_logs(limit=1).flatten()
+		logger.debug(f"fetching audit log entries took {time() - start}")
+
 		entry = entries[0]
 		if entry.action != discord.AuditLogAction.message_unpin:
 			return
@@ -46,12 +50,19 @@ class Unpin(Cog):
 		#
 		#   this introduces maybe 1-2 seconds of lag to fetch all pins,
 		#   but it ensures correctness.
+
+		start = time()
 		pinned_messages = await channel.pins()
-		pinned_message_ids = {message.id for message in pinned_messages}
+		logger.debug(f"fetching channel pins took {time() - start}")
+
+		start = time()
+		pinned_message_ids = [message.id for message in pinned_messages]
+		logger.debug(f"fetching pinned message ids took {time() - start}")
+		
 		if message_id in pinned_message_ids:
 			return
 		
-		logger.info(f"unpin detected")
+		logger.info("unpin detected")
 		
 		message = await channel.fetch_message(message_id)
 		url = f"https://discord.com/channels/{guild.id}/{channel.id}/{message.id}"
