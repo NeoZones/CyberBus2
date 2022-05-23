@@ -41,6 +41,9 @@ class Unpin(Cog):
 		#   detected unpin is in fact NOT currently pinned.
 		#   if it is, i.e. if the unpinned message is actually pinned,
 		#   then we return out of this function / ignore this event.
+		#
+		#   this introduces maybe 1-2 seconds of lag to fetch all pins,
+		#   but it ensures correctness.
 		pinned_messages = await channel.pins()
 		pinned_message_ids = {message.id for message in pinned_messages}
 		if message_id in pinned_message_ids:
