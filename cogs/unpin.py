@@ -29,7 +29,8 @@ class Unpin(Cog):
 
 		guild = channel.guild
 
-		entry: discord.AuditLogEntry = await guild.audit_logs(limit=1).flatten()[0]
+		entries = await guild.audit_logs(limit=1).flatten()
+		entry = entries[0]
 
 		logger.debug(f"{entry.created_at=}")
 		logger.debug(f"{last_pin=}")
