@@ -28,14 +28,12 @@ class Audit(Cog):
 	def __init__(self, bot: discord.Bot):
 		self.bot: discord.Bot = bot
 		self.channel: discord.TextChannel = self.bot.get_channel(Audit.CHANNEL)
-		self.guild: discord.Guild = self.bot.get_guild(Audit.GUILD)
 		print("Initialized Audit cog")
 
 	@Cog.listener()
 	async def on_ready(self):
 		await self.bot.wait_until_ready()
 		self.channel = self.bot.get_channel(Audit.CHANNEL)
-		self.guild = self.bot.get_guild(Audit.GUILD)
 
 	# MESSAGES ==================================================================
 
