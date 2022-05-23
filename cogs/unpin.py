@@ -2,7 +2,6 @@ import discord
 from discord.ext.commands import Cog
 from os import path, makedirs
 import logging
-from time import time
 
 if not path.exists('.logs'):
 	makedirs('.logs')
