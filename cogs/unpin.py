@@ -31,14 +31,23 @@ class Unpin(Cog):
 
 		entries = await guild.audit_logs(limit=1).flatten()
 		entry = entries[0]
-
-		logger.debug(f"{entry.created_at=}")
-		logger.debug(f"{last_pin=}")
-		logger.debug(f"{entry.action=}")
-
-		# logger.info(f"unpin detected")
-		
 		message_id = entry.extra.message_id
+
+		# when a message is pinned, the last audit log entry
+		#   might still be the previous unpin,
+		#   if a message is unpinned and pinned quickly.
+		#
+		#   therefore, we check to make sure that the
+		#   detected unpin is in fact NOT currently pinned.
+		#   if it is, i.e. if the unpinned message is actually pinned,
+		#   then we return out of this function / ignore this event.
+		pinned_messages = await channel.pins()
+		pinned_message_ids = {message.id for message in pinned_messages}
+		if message_id in pinned_message_ids:
+			return
+		
+		logger.info(f"unpin detected")
+		
 		message = await channel.fetch_message(message_id)
 		url = f"https://discord.com/channels/{guild.id}/{channel.id}/{message.id}"
 
