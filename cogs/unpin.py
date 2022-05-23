@@ -30,43 +30,18 @@ class Unpin(Cog):
 		logger.debug("message pinned or unpinned")
 		guild = channel.guild
 
-		start = time()
 		entries = await guild.audit_logs(limit=1).flatten()
-		logger.debug(f"fetching audit log entries took {time() - start}")
-
 		entry = entries[0]
 		if entry.action != discord.AuditLogAction.message_unpin:
 			return
+		
 		message_id = entry.extra.message_id
-
-		# when a message is pinned, the last audit log entry
-		#   might still be the previous unpin,
-		#   if a message is unpinned and pinned quickly.
-		#
-		#   therefore, we check to make sure that the
-		#   detected unpin is in fact NOT currently pinned.
-		#   if it is, i.e. if the unpinned message is actually pinned,
-		#   then we return out of this function / ignore this event.
-		#
-		#   this introduces maybe 1-2 seconds of lag to fetch all pins,
-		#   but it ensures correctness.
-
-		start = time()
-		pinned_messages = await channel.pins()
-		logger.debug(f"fetching channel pins took {time() - start}")
-
-		start = time()
-		pinned_message_ids = [message.id for message in pinned_messages]
-		logger.debug(f"fetching pinned message ids took {time() - start}")
-		
-		if message_id in pinned_message_ids:
-			return
-		
-		logger.info("unpin detected")
-		
 		message = await channel.fetch_message(message_id)
-		url = f"https://discord.com/channels/{guild.id}/{channel.id}/{message.id}"
+		if message.pinned:
+			return
 
+		logger.info("unpin detected")
+		url = f"https://discord.com/channels/{guild.id}/{channel.id}/{message.id}"
 		msg = await channel.send(
 			embed = discord.Embed(
 				title = "Message unpinned",
