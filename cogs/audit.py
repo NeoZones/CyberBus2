@@ -23,7 +23,6 @@ class Audit(Cog):
 
 	CHANNEL = 519071523714367489 # server-log channel
 	#CHANNEL = 951378341162807387 # bot-test channel
-	GUILD = int(getenv("GUILD_ID"))
 
 	def __init__(self, bot: discord.Bot):
 		self.bot: discord.Bot = bot

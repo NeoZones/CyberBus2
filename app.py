@@ -37,7 +37,7 @@ async def on_ready():
 
 """ Load cogs """
 from os import listdir
-def list_cogs():
+def list_cogs() -> list[str]:
 	cog_list = []
 	for file in listdir("cogs"):
 		if not file.endswith(".py"):
@@ -61,7 +61,7 @@ for cog in cogs:
 from discord.commands import Option, permissions
 
 async def cog_autocomplete(ctx: discord.AutocompleteContext):
-	return list_cogs()
+	return [cog for cog in list_cogs() if cog.lower().startswith( ctx.value.lower() )]
 
 ROLE_ADMIN = 518625964763119616
 ROLE_ADMIN_SFW = 727205354353721374
@@ -93,18 +93,6 @@ def reload_music(ctx):
 	music.repeat_mode = repeat_mode
 	music.search_results = search_results
 
-def reload_unpin(ctx):
-	unpin = bot.get_cog("Unpin")
-
-	cache = unpin.cache
-	guild = unpin.guild
-
-	bot.reload_extension(f"cogs.unpin")
-
-	unpin = bot.get_cog("Unpin")
-	unpin.cache = cache
-	unpin.guild = guild
-
 @bot.command(name='reload')
 async def reload_prefix(ctx, cog: str = None):
 	"""Reload an extension (admin command)"""
@@ -114,8 +102,6 @@ async def reload_prefix(ctx, cog: str = None):
 		return await ctx.send("Please specify a cog to reload")
 	elif cog.lower() == "music":
 		reload_music(ctx)
-	elif cog.lower() == "unpin":
-		reload_unpin(ctx)
 	else:
 		bot.reload_extension(f"cogs.{cog}")
 	await ctx.send(f"Reloaded `{cog}` extension")
