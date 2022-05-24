@@ -7,22 +7,26 @@ def setup(bot: discord.Bot):
 
 class Ussy(Cog):
 	"""Negative reinforcement for alph's brain"""
+	
 	def __init__(self, bot: discord.Bot):
 		self.bot: discord.Bot = bot
 		print("Initialized Ussy cog")
-
+	
 	@Cog.listener()
 	async def on_message(self, message: discord.Message):
 		if message.author.id == self.bot.user.id:
 			return
 		r = re.compile(
 			r'''
-			\b[a-zA-Z]*ussy\b
-			''',
-			re.VERBOSE | re.IGNORECASE
-			)
+			\b
+			[a-zA-Z]*
+			ussy
+			\b
+			''', re.VERBOSE | re.IGNORECASE
+		)
 		matches = set(r.findall(message.content))
-		check = matches - set([
+		check = matches - set(
+			[
 			# special cases
 			'cyberbussy', # this bot's nickname includes "ussy"
 			# 4 letter words
@@ -44,7 +48,7 @@ class Ussy(Cog):
 			# 7 letter words
 			'ampussy', # obsolete term for "ampersand" (&)
 			'mucussy', # full of mucus
-			'chaussy', 
+			'chaussy',
 			'debussy',
 			'proussy',
 			'unfussy',
@@ -72,6 +76,10 @@ class Ussy(Cog):
 			'tussy-mussy',
 			# 11 letter words
 			'pocketpussy' # apparently this can be used as one word
-		])
+			]
+		)
 		if check:
-			await message.reply("https://media.discordapp.net/attachments/809278919815200810/955624419219369994/ussy.jpg",mention_author=False)
+			await message.reply(
+				"https://media.discordapp.net/attachments/809278919815200810/955624419219369994/ussy.jpg",
+				mention_author=False
+			)

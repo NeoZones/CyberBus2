@@ -11,7 +11,7 @@ from functools import partial
 import logging
 
 if not path.exists('.logs'):
-		makedirs('.logs')
+	makedirs('.logs')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)

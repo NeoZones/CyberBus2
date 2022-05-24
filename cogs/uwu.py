@@ -18,11 +18,12 @@ class Uwu(Cog):
 		If no text is included and the message is a reply,
 		uwu-ify the replied-to message."""
 		if reply := ctx.message.reference:
-			text = await ctx.channel.fetch_message(reply.message_id)
-			text = text.content
+			message = await ctx.channel.fetch_message(reply.message_id)
+			text = message.content
 		if not text:
 			history = await ctx.channel.history(limit=2).flatten()
-			text = history[1].content
+			_, message = history
+			text = message.content
 		
 		suffixes = [
 			" XDDD",

@@ -1,11 +1,13 @@
 import discord
 from discord.ext.commands import Cog
 from datetime import timedelta
-from os import getenv, path, makedirs
+
+"""Set up logging"""
+from os import path, makedirs
 import logging
 
 if not path.exists('.logs'):
-		makedirs('.logs')
+	makedirs('.logs')
 		
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
@@ -15,6 +17,7 @@ fh.setFormatter(formatter)
 if not len(logger.handlers):
 	logger.addHandler(fh)
 
+"""Cog definition"""
 def setup(bot: discord.Bot):
 	bot.add_cog(Audit(bot))
 
@@ -1165,7 +1168,7 @@ class Audit(Cog):
 		).add_field(
 			name = "Max age",
 			value = str(timedelta(seconds = invite.max_age))
-		).add_footer(
+		).set_footer(
 			text = "Invite " + invite.id
 		)
 
@@ -1202,7 +1205,7 @@ class Audit(Cog):
 		).add_field(
 			name = "Created at",
 			value = invite.created_at
-		).add_footer(
+		).set_footer(
 			text = "Invite " + invite.id
 		)
 

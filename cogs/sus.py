@@ -7,10 +7,11 @@ def setup(bot: discord.Bot):
 
 class Sus(Cog):
 	"""Obviate the need for ByteMoth"""
+	
 	def __init__(self, bot: discord.Bot):
 		self.bot: discord.Bot = bot
 		print("Initialized Sus cog")
-
+	
 	@Cog.listener()
 	async def on_message(self, message: discord.Message):
 		if message.author.id == self.bot.user.id:
@@ -24,8 +25,7 @@ class Sus(Cog):
 			|\bamogus
 			|\bimpostor(?!.*syndrome)
 			|\bimposter(?!.*syndrome)
-			''',
-			re.VERBOSE | re.IGNORECASE
-			)
+			''', re.VERBOSE | re.IGNORECASE
+		)
 		if r.findall(message.content):
 			await message.add_reaction(self.bot.get_emoji(844243428577116201))
