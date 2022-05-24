@@ -460,6 +460,18 @@ class Music(Cog):
 	
 	def after(self, ctx: Context):
 		logger.debug("after() called")
+
+		if not ctx.voice_client:
+			logger.info("no voice client -- bot was disconnected from vc?")
+			self.track = None
+			self.q = None
+			asyncio.run_coroutine_threadsafe(
+				ctx.send(f"Clearing queue after bot left VC"),
+				self.bot.loop
+			).result()
+			logger.info("Cleared queue after bot left VC")
+			return
+
 		if not self.q and self.repeat_mode == Music.REPEAT_NONE:
 			logger.info("queue empty and not repeating")
 			self.track = None
@@ -468,7 +480,9 @@ class Music(Cog):
 				self.bot.loop
 			).result()
 			logger.info("Finished playing queue.")
-		if self.q and not ctx.voice_client.is_playing():
+			return
+
+		if self.q and ctx.voice_client and not ctx.voice_client.is_playing():
 			logger.info("queue exists and voice client is not playing")
 			logger.debug(f"{self.q=}")
 			logger.info("playing next...")
@@ -476,6 +490,7 @@ class Music(Cog):
 				self.play_next(ctx),
 				self.bot.loop
 			).result()
+			return
 
 	def check_for_numbers(self, ctx: Context):
 		"""anti numbers action"""
