@@ -464,7 +464,7 @@ class Music(Cog):
 		if not ctx.voice_client:
 			logger.info("no voice client -- bot was disconnected from vc?")
 			self.track = None
-			self.q = None
+			self.q = []
 			asyncio.run_coroutine_threadsafe(
 				ctx.send(f"Clearing queue after bot left VC"),
 				self.bot.loop
