@@ -24,9 +24,8 @@ class Ussy(Cog):
 			\b
 			''', re.VERBOSE | re.IGNORECASE
 		)
-		matches = set(r.findall(message.content))
-		check = matches - set(
-			[
+		matches = { m.lower() for m in r.findall(message.content) }
+		check = matches - {
 			# special cases
 			'cyberbussy', # this bot's nickname includes "ussy"
 			# 4 letter words
@@ -76,8 +75,7 @@ class Ussy(Cog):
 			'tussy-mussy',
 			# 11 letter words
 			'pocketpussy' # apparently this can be used as one word
-			]
-		)
+		}
 		if check:
 			await message.reply(
 				"https://media.discordapp.net/attachments/809278919815200810/955624419219369994/ussy.jpg",
