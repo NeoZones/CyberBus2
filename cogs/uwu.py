@@ -42,13 +42,13 @@ class Uwu(Cog):
 			" <:",
 			" >w<"
 		]
-		text = re.sub('[rl]', 'w', text)
-		text = re.sub('[RL]', 'W', text)
-		text = re.sub('ma', 'mwa', text)
-		text = re.sub('mu', 'mwu', text)
-		text = re.sub('mo', 'mwo', text)
-		text = re.sub('\bha[sv]e?\b', 'haz', text)
-		text = re.sub('\bthe\b', 'da', text)
-		text = re.sub('\bthis\b', 'dis', text)
+		text = re.sub(r'[rl]', r'w', text)
+		text = re.sub(r'[RL]', r'W', text)
+		text = re.sub(r'ma', r'mwa', text)
+		text = re.sub(r'mu', r'mwu', text)
+		text = re.sub(r'mo', r'mwo', text)
+		text = re.sub(r'\bha[sv]e?\b', r'haz', text)
+		text = re.sub(r'\bthe\b', r'da', text)
+		text = re.sub(r'\bthis\b', r'dis', text)
 		text += random.choice(suffixes)
 		await ctx.send(text)
