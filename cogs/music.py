@@ -664,7 +664,7 @@ class Music(Cog):
 		source: Player = ctx.voice_client.source
 		embed = discord.Embed(
 				title=f"{self.track.title}",
-				url=f"{self.track.source}",
+				url=f"{self.track.source}" if self.track.source.startswith('http') else None,
 			).add_field(
 				name="Progress",
 				value=f"{source.progress}",
