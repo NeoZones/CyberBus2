@@ -519,14 +519,14 @@ class Music(Cog):
 	):
 		logger.debug(f"add_to_queue({query}) called")
 		# Check for permission to add tracks
-		allowed = self.check_for_numbers(ctx)
-		if not allowed:
-			logger.info(f"{ctx.author} is not allowed to add to queue")
-			#return await ctx.send(
-			#"You must be in a voice chat by yourself "
-			#"in order to use this command."
-			#)
-			return await ctx.send("No 💜")
+		# allowed = self.check_for_numbers(ctx)
+		# if not allowed:
+		# 	logger.info(f"{ctx.author} is not allowed to add to queue")
+		# 	#return await ctx.send(
+		# 	#"You must be in a voice chat by yourself "
+		# 	#"in order to use this command."
+		# 	#)
+		# 	return await ctx.send("No 💜")
 		# Ensure we are connected to voice
 		if not ctx.voice_client:
 			logger.warning("no voice client")
