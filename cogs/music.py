@@ -673,10 +673,11 @@ class Music(Cog):
 				icon_url=f"{self.track.requester.display_avatar.url}",
 			)
 		thumb = None
-		if "thumbnail" in source.data:
-			thumb = source.data['thumbnail']
-		elif "thumbnails" in source.data:
-			thumb = source.data['thumbnails'][0]['url']
+		if source.data:
+			if "thumbnail" in source.data:
+				thumb = source.data['thumbnail']
+			elif "thumbnails" in source.data:
+				thumb = source.data['thumbnails'][0]['url']
 		if thumb:
 			embed.set_thumbnail(
 				url=thumb
