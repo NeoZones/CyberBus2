@@ -583,7 +583,7 @@ class Music(Cog):
 		await self.play_next(ctx)
 
 	@command(aliases=['p', 'listen'])
-	async def play(self, ctx: Context, *, query: str):
+	async def play(self, ctx: Context, *, query: str = ""):
 		"""Add track(s) to queue"""
 		if not query:
 			msg = await ctx.send("No query detected")
@@ -594,7 +594,7 @@ class Music(Cog):
 		return await self.add_to_queue(ctx, query, top=False)
 
 	@command(aliases=['ptop', 'top'])
-	async def playtop(self, ctx: Context, *, query: str):
+	async def playtop(self, ctx: Context, *, query: str = ""):
 		"""Add tracks to top of queue"""
 		if not query:
 			msg = await ctx.send("No query detected")
@@ -769,6 +769,16 @@ class Music(Cog):
 		if msg:
 			logger.info("Message sent: Queue has been cleared.")
 		
+	@command()
+	async def refresh(self, ctx: Context):
+		"""Reset bot to fresh state"""
+		logger.info(".refresh")
+		self.q = []
+		self.track = []
+		msg = await ctx.send("Music bot has been refreshed")
+		if msg:
+			logger.info("Message sent: Bot has been refreshed")
+
 	@command(aliases=['v', 'vol'])
 	async def volume(self, ctx: Context, volume: int):
 		"""Changes the player's volume"""
