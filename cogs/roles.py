@@ -56,6 +56,12 @@ ROLES = {
 	'PRONOUN_THEY': 692142321072078918,
 }
 
+COLOR_ROLES = {
+	v for (k,v) in ROLES.items()
+	if k.startswith('COLOR')
+	and v != 726069856528498738
+}
+
 COLORS = [
 	"Light Red",
 	"Red",
@@ -198,7 +204,7 @@ class Roles(Cog):
 			all_current_roles = ctx.interaction.user.roles
 			old_color_roles = []
 			for role in all_current_roles:
-				if role.id in ROLES.values() and role.id != 726069856528498738:
+				if role.id in COLOR_ROLES:
 					old_color_roles.append(role)
 			if old_color_roles:
 				await ctx.interaction.user.remove_roles(*old_color_roles)
