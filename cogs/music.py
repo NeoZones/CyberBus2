@@ -251,7 +251,7 @@ class Music(Cog):
 		tracks = []
 		for entry in entries:
 			url = entry["url"]
-			title = entry["title"]
+			title = entry.get("title", "(no title)")
 			duration = None
 			data = entry
 			if not "duration" in data and not "duration_string" in data:
