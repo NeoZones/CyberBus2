@@ -42,6 +42,7 @@ class Uwu(Cog):
 			" <:",
 			" >w<"
 		]
+		text = text.lower()
 		text = re.sub(r'[rl]', r'w', text)
 		text = re.sub(r'[RL]', r'W', text)
 		text = re.sub(r'ma', r'mwa', text)
