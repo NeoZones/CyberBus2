@@ -27,5 +27,5 @@ class Sus(Cog):
 			|\bimposter(?!.*syndrome)
 			''', re.VERBOSE | re.IGNORECASE
 		)
-		if r.findall(message.content):
+		if r.findall(message.content.encode('ascii', 'ignore').decode('utf-8')):
 			await message.add_reaction(self.bot.get_emoji(844243428577116201))
