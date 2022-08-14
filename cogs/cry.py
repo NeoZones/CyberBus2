@@ -33,7 +33,7 @@ def transform(char: str) -> str:
 
 	# multiply some consonants
 	if char in CONSONANTS and chance(10):
-		return char * random.randint(1,4)
+		return char * random.randint(1,2)
 
 	# doubles a character
 	if chance(10):
