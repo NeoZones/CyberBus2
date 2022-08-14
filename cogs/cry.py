@@ -19,6 +19,10 @@ def transform(char: str) -> str:
 	if char not in LETTERS | NUMBERS:
 		return char
 
+	# apostrophe to semicolons
+	if char = "'" and chance(40):
+		return ';' * random.randint(1,3)
+
 	# add 3 random punctuations
 	if chance(5):
 		return char + random.choice(PUNCTUATION) * random.randint(1,3)
@@ -59,10 +63,10 @@ def cryify(text: str) -> str:
 	# text = re.sub(r'\byou\b', r'u', text) # you -> u
 	# text = re.sub(r'\bto be honest\b', r'tbh', text) # to be honest -> tbh
 	# text = re.sub(r'\bi don\'t know\b', r'idk', text) # i don't know -> idk
-	text = re.sub(r"'", r';', text) # apostrophe to semicolon
-	text = re.sub(r'.', r'...', text) # triple any periods
-	text = re.sub(r';', r';;;', text) # triple semicolons
-	text = re.sub(r',', r',,,', text) # triple commas
+	# text = re.sub(r"'", r';', text) # apostrophe to semicolon
+	# text = re.sub(r'.', r'...', text) # triple any periods
+	# text = re.sub(r';', r';;;', text) # triple semicolons
+	# text = re.sub(r',', r',,,', text) # triple commas
 
 	# transform text into output
 	output = ''
