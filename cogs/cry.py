@@ -68,7 +68,7 @@ def cryify(text: str) -> str:
 	output = ''
 	for index, char in enumerate(text):
 		if chance(5) and index < len(text):
-			output = output + char[index+1] + char
+			output = output + text[index+1] + char
 			continue
 		output += transform(char)
 	return output
