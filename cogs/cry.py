@@ -20,7 +20,7 @@ def transform(char: str) -> str:
 		return char
 
 	# apostrophe to semicolons
-	if char = "'" and chance(40):
+	if char == "'" and chance(40):
 		return ';' * random.randint(1,3)
 
 	# add 3 random punctuations
