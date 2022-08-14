@@ -25,7 +25,7 @@ def transform(char: str) -> str:
 
 	# add 3 random punctuations
 	if chance(5):
-		return char + random.choice(PUNCTUATION) * random.randint(1,3)
+		return char + random.choice(tuple(PUNCTUATION)) * random.randint(1,3)
 
 	# add a second vowel
 	if char in VOWELS and chance(5):
@@ -45,7 +45,7 @@ def transform(char: str) -> str:
 
 	# add a random character
 	if chance(1):
-		return random.choice(LETTERS | PUNCTUATION)
+		return random.choice(tuple(LETTERS | PUNCTUATION))
 
 	# add random spacing
 	if chance(5):
