@@ -661,8 +661,10 @@ class Music(Cog):
 			return
 		page = self.h[-limit:]
 		formatted_results = f"Last {limit} tracks played:\n"
-		for entry in page:
-			formatted_results += f"{entry}\n"
+		for i, entry in reversed(enumerate(page)):
+			formatted_results += (
+				f"{i+1}: {entry}\n"
+			)
 		msg = await ctx.send(formatted_results)
 		if msg:
 			logger.info("Message sent: Sent history page to channel")
