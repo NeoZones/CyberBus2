@@ -661,9 +661,9 @@ class Music(Cog):
 			return
 		page = self.h[-limit:]
 		formatted_results = f"Last {limit} tracks played:\n"
-		for i, entry in reversed(list(enumerate(page))):
+		for i, entry in enumerate(page):
 			formatted_results += (
-				f"{i+1}: {entry}\n"
+				f"{i - len(page)}: {entry}\n"
 			)
 		msg = await ctx.send(formatted_results)
 		if msg:
