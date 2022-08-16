@@ -660,7 +660,7 @@ class Music(Cog):
 				logger.info("Message sent: No available history in this session.")
 			return
 		page = self.h[-limit:]
-		formatted_results = f"Last {limit} tracks played:\n"
+		formatted_results = f"Last {len(page)} tracks played:\n"
 		for i, entry in enumerate(page):
 			formatted_results += (
 				f"{i - len(page)}: {entry}\n"
