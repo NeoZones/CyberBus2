@@ -142,11 +142,12 @@ class Music(Cog):
 
 	def __init__(self, bot: discord.Bot):
 		self.bot: discord.Bot = bot
-		self.q: list[Track] = []
+		self.q: list[Track] = [] # queue
 		self.track: Track | None = None
 		self.repeat_mode = Music.REPEAT_NONE
 		self.search_results: dict = None
-		self.i: int = -1
+		self.i: int = -1 # initial value used for repeat mode
+		self.h: list[Track] = [] # history
 		print("Initialized Music cog")
 	
 	@command(aliases=['start', 'summon', 'connect'])
@@ -453,6 +454,7 @@ class Music(Cog):
 			player = await Player.prepare_file(self.track, loop = self.bot.loop)
 		
 		logger.info("playing Player on the voice client")
+		self.h += [self.track]
 		ctx.voice_client.play(
 			player,
 			after=lambda e: self.after(ctx)
@@ -622,7 +624,8 @@ class Music(Cog):
 		# check that there is a queue and a current track
 		if not self.q and not self.track:
 			msg = await ctx.send("The queue is currently empty.")
-			logger.info("Message sent: The queue is currently empty.")
+			if msg:
+				logger.info("Message sent: The queue is currently empty.")
 			return
 		# paginate the queue to just one page
 		full_queue = [self.track] + self.q
@@ -646,6 +649,23 @@ class Music(Cog):
 		msg = await ctx.send(formatted_results)
 		if msg:
 			logger.info("Message sent: Sent queue page to channel")
+
+	@command(aliases=['h'])
+	async def history(self, ctx: Context, limit: int = 10):
+		"""Show recent actions"""
+		logger.info(f".history {limit}" if limit else ".history")
+		if not self.h:
+			msg = await ctx.send("No available history in this session.")
+			if msg:
+				logger.info("Message sent: No available history in this session.")
+			return
+		page = self.h[-limit:]
+		formatted_results = f"Last {limit} tracks played:\n"
+		for entry in page:
+			formatted_results += f"{entry}\n"
+		msg = await ctx.send(formatted_results)
+		if msg:
+			logger.info("Message sent: Sent history page to channel")
 	
 	@command(aliases=['np'])
 	async def nowplaying(self, ctx: Context):
