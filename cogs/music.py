@@ -795,6 +795,7 @@ class Music(Cog):
 		logger.info(".refresh")
 		self.q = []
 		self.track = []
+		self.h = []
 		msg = await ctx.send("Music bot has been refreshed")
 		if msg:
 			logger.info("Message sent: Bot has been refreshed")
