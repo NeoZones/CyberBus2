@@ -661,7 +661,7 @@ class Music(Cog):
 			return
 		page = self.h[-limit:]
 		formatted_results = f"Last {limit} tracks played:\n"
-		for i, entry in reversed(enumerate(page)):
+		for i, entry in reversed(list(enumerate(page))):
 			formatted_results += (
 				f"{i+1}: {entry}\n"
 			)
