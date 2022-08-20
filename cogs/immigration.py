@@ -25,19 +25,19 @@ class Immigration(Cog):
 	
 	@Cog.listener()
 	async def on_member_remove(self, member: discord.Member):
-		tag = f'{member.display_name} ({member.id})'
+		tag = f'{member.display_name} ({member.name}#{member.discriminator})'
 		await self.channel.send(f'And then, {tag} left the Discord server.')
 	
 	@Cog.listener()
 	async def on_member_ban(self, guild: discord.Guild, user: discord.User):
-		tag = f'{user.display_name} ({user.id})'
+		tag = f'{user.display_name} ({user.name}#{user.discriminator})'
 		await self.channel.send(
 			f'{tag} has been exiled for their crimes against humanity!'
 		)
 	
 	@Cog.listener()
 	async def on_member_unban(self, guild: discord.Guild, user: discord.User):
-		tag = f'{user.display_name} ({user.id})'
+		tag = f'{user.display_name} ({user.name}#{user.discriminator})'
 		await self.channel.send(
 			f'{tag} has been forgiven for their crimes against humanity.'
 		)
