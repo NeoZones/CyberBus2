@@ -58,7 +58,7 @@ class Track:
 		self.data = data
 	
 	def __repr__(self):
-		return f"<Track {self.source=} {self.requester=} {self.title=} {self.duration=} {self.data=}"
+		return f"<Track {self.source=} {self.requester=} {self.title=} {self.duration=}"
 	
 	def __str__(self):
 		title = f"**{self.title}**" if self.title else f"`{self.source}`"
