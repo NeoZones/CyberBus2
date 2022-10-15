@@ -102,7 +102,7 @@ class Player(discord.PCMVolumeTransformer):
 		return cls(data['url'], track.duration, data = data, ffmpeg_options = {"options": "-vn", "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"})
 
 	def __repr__(self):
-		return ''.join([f"{key=}\n" for key in self.__dict__])
+		return ''.join([f"{key=}\n" for key in self.__dict__ if key != "data"])
 
 	def __str__(self):
 		return (
