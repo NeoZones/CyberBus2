@@ -726,6 +726,9 @@ class Music(Cog):
 		"""Remove track at given position"""
 		logger.info(f".remove {i}")
 		i -= 1 # convert to zero-indexing
+		logger.warning(f"{self.q=}")
+		logger.warning(f"trying to pop index {i}")
+		logger.warning(f"{self.q[i]=}")
 		track = self.q.pop(i)
 		msg = await ctx.send(f"Removed: {track.title}")
 		if msg:
