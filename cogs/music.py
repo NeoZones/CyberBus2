@@ -725,8 +725,7 @@ class Music(Cog):
 	async def remove(self, ctx: Context, i: int):
 		"""Remove track at given position"""
 		logger.info(f".remove {i}")
-		i -= 1 # convert to zero-indexing
-		logger.warning(f"{self.q=}")
+		i -= 2 # convert to zero-indexing and also the np track is popped
 		logger.warning(f"trying to pop index {i}")
 		logger.warning(f"{self.q[i]=}")
 		track = self.q.pop(i)
