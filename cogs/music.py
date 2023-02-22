@@ -45,6 +45,7 @@ class Track:
 		source: str,
 		requester: discord.User,
 		title: str = None,
+		original_url: str = None,
 		duration = None,
 		author: str = None,
 		author_icon: str = None,
@@ -53,6 +54,7 @@ class Track:
 		self.source = source
 		self.requester = requester
 		self.title = title
+		self.original_url = original_url
 		self.duration = duration
 		self.author = author
 		self.data = data
@@ -251,7 +253,7 @@ class Music(Cog):
 		# Create Track objects
 		tracks = []
 		for entry in entries:
-			url = entry["url"]
+			source = entry["url"]
 			title = entry.get("title", "(no title)")
 			duration = None
 			data = entry
@@ -273,7 +275,7 @@ class Music(Cog):
 				duration = s + 60*m + 3600*h
 			tracks.append(
 				Track(
-					source=url,
+					source=source,
 					requester=ctx.message.author,
 					title=title,
 					duration=duration,
@@ -367,13 +369,15 @@ class Music(Cog):
 
 		for i, result in enumerate(self.search_results['entries']):
 
+			result: dict
+			
 			if result['live_status'] == "is_upcoming":
 				continue # skip YT Premieres
 
-			title = result['title']
-			duration = format_time(int(result['duration']))
-			uploader = result['uploader']
-			views = "{:,}".format(result['view_count'])
+			title = result.get('title', '<no title found>')
+			duration = format_time(int(result.get('duration'))) if ('duration' in result) else '?:??'
+			uploader = result.get('channel', '<no uploader found>')
+			views = "{:,}".format(result.get('view_count')) if ('view_count' in result) else '<no view count found>'
 			image = result['thumbnails'][-1]['url']
 			height = result['thumbnails'][-1]['height']
 			width = result['thumbnails'][-1]['width']
@@ -686,7 +690,7 @@ class Music(Cog):
 		source: Player = ctx.voice_client.source
 		embed = discord.Embed(
 				title=f"{self.track.title}",
-				url=f"{self.track.source}" if self.track.source.startswith('http') else None,
+				url=f"{self.track.original_url}" if self.track.original_url else None,
 			).add_field(
 				name="Progress",
 				value=f"{source.progress}",
