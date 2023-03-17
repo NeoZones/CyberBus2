@@ -254,6 +254,7 @@ class Music(Cog):
 		tracks = []
 		for entry in entries:
 			source = entry["url"]
+			original_url = entry.get("original_url")
 			title = entry.get("title", "(no title)")
 			duration = None
 			data = entry
@@ -276,7 +277,7 @@ class Music(Cog):
 			tracks.append(
 				Track(
 					source=source,
-					original_url=source,
+					original_url=original_url,
 					requester=ctx.message.author,
 					title=title,
 					duration=duration,
