@@ -276,6 +276,7 @@ class Music(Cog):
 			tracks.append(
 				Track(
 					source=source,
+					original_url=source,
 					requester=ctx.message.author,
 					title=title,
 					duration=duration,
