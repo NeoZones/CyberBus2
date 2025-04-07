@@ -70,10 +70,12 @@ class Ussy(Cog):
 			'overfussy',
 			# 10 letter words
 			'mouthpussy', # like "asspussy" but for the mouth
+			'landahussy', # alternate spelling for an irish town
 			'superpussy',
 			'tussymussy', # alternate spelling of tussie-mussie, historically used in Victorian times to refer to a nosegay* given by one person to another to convey a message in the language of flowers**. *nosegay = like a small bouquet of flowers intended to be put up to your nose and smelt, **language of flowers = floriography
 			'tussy-mussy',
 			# 11 letter words
+			'landahaussy', # an irish town
 			'pocketpussy' # apparently this can be used as one word
 		}
 		if check:
