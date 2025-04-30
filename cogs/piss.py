@@ -20,8 +20,7 @@ class Piss(Cog):
 		kink = re.compile(
 			r'''
 			\b
-			kink
-			s?
+			the\skinks
 			\b
 			''', re.VERBOSE | re.IGNORECASE
 		)
