@@ -6,7 +6,7 @@ def setup(bot: discord.Bot):
 	bot.add_cog(Piss(bot))
 
 class Piss(Cog):
-	"""Provide too much information when a certain substance is mentioned"""
+	"""Provide too much information when a certain english rock band is mentioned"""
 	
 	def __init__(self, bot: discord.Bot):
 		self.bot: discord.Bot = bot
@@ -16,13 +16,7 @@ class Piss(Cog):
 	async def on_message(self, message: discord.Message):
 		if message.author.id == self.bot.user.id:
 			return
-		piss = re.compile(
-			r'''
-			\b
-			piss
-			\b
-			''', re.VERBOSE | re.IGNORECASE
-		)
+
 		kink = re.compile(
 			r'''
 			\b
@@ -34,5 +28,3 @@ class Piss(Cog):
 		
 		if kink.findall(message.content):
 			await message.reply("I have kinks! PISS", mention_author=False)
-		# elif piss.findall(message.content):
-		# 	await message.reply("I have kinks!", mention_author=False)
